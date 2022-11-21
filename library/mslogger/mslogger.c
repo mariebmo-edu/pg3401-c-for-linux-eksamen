@@ -13,11 +13,11 @@ void MsLogger(unsigned long ulErrorType, int iLine, char *szFile, const char *ps
 
     /*File handling*/
     static FILE *fLogFile = NULL;
-    char szFileName = char[256] = {0};
+    char szFileName[256] = {0};
     time_t tTimeAndDate = 0;
 
     if(fLogFile == NULL){
-        tTimeAndDate = time(null);
+        tTimeAndDate = time(NULL);
         snprintf(szFileName, 256-1, "debug_log_%s.txt", localtime(&tTimeAndDate));
     }
 
@@ -27,10 +27,14 @@ void MsLogger(unsigned long ulErrorType, int iLine, char *szFile, const char *ps
     static unsigned int iCallCounter = 0;
 
     va_start(vaArgumentPointer, pszFormat);
-    vfprintf(szOutputString, 256-1, pszFormat, vaArgumentPointer);
+    vsnprintf(szOutputString, 256-1, pszFormat, vaArgumentPointer);
     va_end(vaArgumentPointer);
 
-    fprintf(fp, "%04i: error type is %lu\n", iCallCounter++, pszType, szOutputString);
+    /*prints to file*/
+    fprintf(fLogFile, "%04i|%s: %s (%s:%i)\r\n", iCallCounter++, pszType, szOutputString, szFileName, iLine);
+
+    /*prints to console*/
+    printf("%04i|%s: %s (%s:%i)\r\n", iCallCounter, pszType, szOutputString, szFileName, iLine);
 
     return;
 }
