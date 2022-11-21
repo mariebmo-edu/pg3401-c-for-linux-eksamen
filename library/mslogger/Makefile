@@ -1,20 +1,20 @@
 INCLDIR = ./include
 CC = gcc
-CFLAGS = -O2
+CFLAGS = -O2 -ansi
 CFLAGS += -I$(INCLDIR)
 
 OBJDIR = obj
 
-_DEPS = oppgave2.h
+_DEPS = mslogger.h
 DEPS = $(patsubst %,$(INCLDIR)/%,$(_DEPS))
 
-_OBJS = oppgave2.o
+_OBJS = mslogger.o
 OBJS = $(patsubst %,$(OBJDIR)/%,$(_OBJS))
 
 $(OBJDIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-oppgave2: $(OBJS)
+mslogger: $(OBJS)
 	gcc -o $@ $^ $(CFLAGS)
 
 .PHONY: clean
