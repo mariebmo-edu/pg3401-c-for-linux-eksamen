@@ -1,0 +1,8 @@
+//
+// Created by marie on 08.12.2022.
+//
+
+#ifndef CFORLINUXEKSAMEN_OPPGAVE2_H
+#define CFORLINUXEKSAMEN_OPPGAVE2_H
+
+#endif //CFORLINUXEKSAMEN_OPPGAVE2_H

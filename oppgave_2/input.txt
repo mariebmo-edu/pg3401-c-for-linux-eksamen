@@ -1,0 +1,1 @@
+Dette er en test på oppgave 2, eksamen 2022. Teksten skal konverteres til hexadesimalt enkodede ascii tegn.
