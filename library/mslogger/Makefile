@@ -14,8 +14,8 @@ OBJS = $(patsubst %,$(OBJDIR)/%,$(_OBJS))
 $(OBJDIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-mslogger: $(OBJS)
-	gcc -o $@ $^ $(CFLAGS)
+libmslogger.a: $(OBJS)
+	ar rcs libmslogger.a -o $@ $^
 
 .PHONY: clean
 clean:
