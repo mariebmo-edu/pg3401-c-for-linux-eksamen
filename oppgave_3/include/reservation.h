@@ -15,6 +15,7 @@ struct reservation {
     float fPricePerDay;
 };
 
+void clearAllocation(struct reservation **ppHead, struct reservation **ppTail);
 void initReservation(struct reservation **ppTail, struct reservation **ppHead);
 void insertBefore(struct reservation **ppBeforeRes, char *pszName, char *pszRoomNr, int iDate, int iDays, float fPricePerDay);
 int insertAfter(struct reservation **ppAfterRes, char *pszName, char *pszRoomNr, int iDate, int iDays, float fPricePerDay);

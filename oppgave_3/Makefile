@@ -5,10 +5,10 @@ CFLAGS += -I$(INCLDIR)
 
 OBJDIR = obj
 
-_DEPS = oppgave3.h reservation.h
+_DEPS =  reservation.h menu.h oppgave3.h
 DEPS = $(patsubst %,$(INCLDIR)/%,$(_DEPS))
 
-_OBJS = oppgave3.o reservation.o
+_OBJS =  reservation.o menu.o oppgave3.o
 OBJS = $(patsubst %,$(OBJDIR)/%,$(_OBJS))
 
 $(OBJDIR)/%.o: %.c $(DEPS)

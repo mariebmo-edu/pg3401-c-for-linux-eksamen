@@ -3,16 +3,11 @@
 //
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include "include/oppgave3.h"
 #include "include/reservation.h"
-
-void printMenu();
-int handleMenu();
-char getFirstCharOfUserInput();
-void addReservationMenu(struct reservation **ppTail);
-void searchByNameMenu(struct reservation **ppHead);
-void clearInputStack();
+#include "include/menu.h"
+#include "include/oppgave3.h"
 
 int main(int argc, char *argv[]){
 
@@ -21,66 +16,59 @@ int main(int argc, char *argv[]){
     initReservation(&pTail, &pHead);
 
     //Init test data
-    insertAfter(&pTail, "Trine", "1", 20220101, 5, 9.99);
-    insertAfter(&pTail, "Marie", "2", 20220102, 6, 12.99);
-    insertAfter(&pTail, "Kari", "3", 20220103, 7, 5.50);
-    insertAfter(&pTail, "Ole", "4", 20220104, 8, 20.3);
-    insertAfter(&pTail, "Per", "5", 20220105, 9, 59.90);
+    insertAfter(&pTail, "Trine", "1", 01012023, 5, 9.99);
+    insertAfter(&pTail, "Marie", "2", 02022022, 6, 12.99);
+    insertAfter(&pTail, "Kari", "3", 03032023, 7, 5.50);
+    insertAfter(&pTail, "Ole", "4", 09121992, 8, 20.3);
+    insertAfter(&pTail, "Per", "5", 01022033, 9, 59.90);
 
     char chChoice;
+    int iDecoratorLength = 50;
+    char cDecorator = '~';
     int iExit = 0;
 
     while(iExit == 0){
-        printMenu();
+        printMenu(iDecoratorLength, cDecorator);
         chChoice = getFirstCharOfUserInput();
 
         switch (chChoice) {
             case '1':
-                printf("1. Add reservation\n");
+                printHeader("1. Add reservation", iDecoratorLength, cDecorator);
                 addReservationMenu(&pTail);
                 break;
             case '2':
-                printf("2. Delete last reservation\n");
+                printHeader("2. Delete last reservation", iDecoratorLength, cDecorator);
                 deleteReservation(&pTail);
                 break;
             case '3':
-                printf("3. Delete all completed reservations\n");
+                printHeader("3. Delete all completed reservations", iDecoratorLength, cDecorator);
                 deleteCompletedReservations(&pHead);
                 break;
             case '4':
-                printf("4. Search by name\n");
+                printHeader("4. Search by name", iDecoratorLength, cDecorator);
                 searchByNameMenu(&pHead);
                 break;
             case '5':
-                printf("5. Sum up total price for all reservations\n");
+                printHeader("5. Sum price of all reservations", iDecoratorLength, cDecorator);
                 sumPriceOfReservations(&pHead);
                 break;
             case '6':
-                printf("6. Print all reservations\n");
+                printHeader("6. Print all reservations", iDecoratorLength, cDecorator);
                 printReservations(&pHead);
                 break;
             case '0':
-                printf("0. Exit\n");
+                printHeader("0. Exit", iDecoratorLength, cDecorator);
                 iExit = 1;
+
                 break;
             default:
                 printf("%c. Invalid input\n", chChoice);
                 break;
-        }
-        printf("\n");
-    }
-}
+        } //End switch
+    } // End while
 
-void printMenu(){
-    printf("1. Add reservation\n");
-    printf("2. Delete last reservation\n");
-    printf("3. Delete all completed reservations\n");
-    printf("4. Search by name\n");
-    printf("5. Sum up total price for all reservations\n");
-    printf("6. Print all reservations\n");
-    printf("7. Exit program\n");
-    printf("Enter choice: ");
-}
+    clearAllocation(&pHead, &pTail);
+} // End main
 
 char getFirstCharOfUserInput(){
     char chFirstChar;
@@ -137,10 +125,11 @@ void addReservationMenu(struct reservation **ppTail){
     }
 
     if(insertAfter(ppTail, szName, szRoomNr, iDate, iDays, fPricePerDay)){
+        printSeparator(50, '-');
         printf("Reservation added.\n");
         printReservation(ppTail);
     }
-}
+} // End addReservationMenu
 
 void searchByNameMenu(struct reservation **ppHead){
     char szName[128];
