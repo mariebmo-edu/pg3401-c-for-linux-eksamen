@@ -30,6 +30,9 @@ int main(int argc, char *argv[]) {
     printf("Server: %s\n", pMyHttp->szServer);
     printf("ContentType: %s\n", pMyHttp->szContentType);
 
+    free(pMyHttp);
+    pMyHttp = NULL;
+
     return 0;
 }
 
