@@ -1,11 +1,9 @@
-//
-// Created by marie on 09.12.2022.
-//
 #include <pthread.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "include/oppgave5.h"
 
 #define BUFFER_SIZE 4096
@@ -13,18 +11,18 @@
 struct threadData {
     char szDataBuffer[BUFFER_SIZE];
     int iUsedBytes;
+    bool fileProcessed;
+    pthread_mutex_t mutex;
 };
 
 struct threadAData {
     struct threadData *pThreadData;
     char *fileName;
-    int fileProcessed;
 };
 
 struct threadBData {
     struct threadData *pThreadData;
     unsigned int bytesProcessed[256];
-    int fileProcessed;
 };
 
 void *threadAFunction(void *arg);
@@ -32,19 +30,20 @@ void *threadBFunction(void *arg);
 
 int main(int argc, char *argv[]) {
 
-
+    // Initialize the threadData structure and its mutex
     struct threadData threadData;
     threadData.iUsedBytes = 0;
+    threadData.fileProcessed = false;
+    pthread_mutex_init(&threadData.mutex, NULL);
 
+    // Pass a pointer to the threadData structure to the thread functions
     struct threadAData threadAData;
     threadAData.pThreadData = &threadData;
     threadAData.fileName = "../dokumenter/PG3401-Hjemmeeksamen-14dager-H22.pdf";
-    threadAData.fileProcessed = 0;
 
     struct threadBData threadBData;
     memset(threadBData.bytesProcessed, 0, 256*sizeof(unsigned int));
     threadBData.pThreadData = &threadData;
-    threadBData.fileProcessed = 0;
 
     pthread_t threadA, threadB;
     if (pthread_create(&threadA, NULL, threadAFunction, &threadAData) != 0) {
@@ -65,11 +64,16 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    printf("FINISHED! Character count: \n");
+
     int i  = 0;
     while(i < 256){
-        printf("%d: %i\n", i, threadBData.bytesProcessed[i]);
+        printf("%02x: %i\n", i, threadBData.bytesProcessed[i]);
         i++;
     }
+
+    // Destroy the mutex
+    pthread_mutex_destroy(&threadData.mutex);
 
     return 1;
 }
@@ -90,12 +94,18 @@ void *threadAFunction(void *arg) {
         printf("Thread A-%d: Reading file\n", i);
         int c = fgetc(file);
         if (c == EOF) {
-            pThreadAData->fileProcessed = true;
+            // Set the fileProcessed flag to true to indicate that the file has been read
+            pthread_mutex_lock(&pThreadAData->pThreadData->mutex);
+            pThreadAData->pThreadData->fileProcessed = true;
+            pthread_mutex_unlock(&pThreadAData->pThreadData->mutex);
             break;
         }
         if (pThreadAData->pThreadData->iUsedBytes < BUFFER_SIZE) {
+            // Lock the mutex before modifying the shared data
+            pthread_mutex_lock(&pThreadAData->pThreadData->mutex);
             pThreadAData->pThreadData->szDataBuffer[pThreadAData->pThreadData->iUsedBytes] = (char) c;
             pThreadAData->pThreadData->iUsedBytes++;
+            pthread_mutex_unlock(&pThreadAData->pThreadData->mutex);
         }
         i++;
     }
@@ -112,17 +122,28 @@ void *threadBFunction(void *arg) {
 
     int i = 0;
     while (true) {
-        printf("Thread B-%d: Processing data\n", i);
-        if (pThreadBData->pThreadData->iUsedBytes && !pThreadBData->fileProcessed) {
-            pThreadBData->bytesProcessed[pThreadBData->pThreadData->szDataBuffer[pThreadBData->pThreadData->iUsedBytes - 1]]++;
-            pThreadBData->pThreadData->iUsedBytes--;
-        }
-        if (pThreadBData->fileProcessed) {
+        // Check the fileProcessed flag and exit the loop if it is true
+        if (pThreadBData->pThreadData->fileProcessed) {
             break;
+        }
+
+        printf("Thread B-%d: Processing data\n", i);
+        // Lock the mutex before reading from the shared buffer
+        pthread_mutex_lock(&pThreadBData->pThreadData->mutex);
+
+        if (pThreadBData->pThreadData->iUsedBytes > 0) {
+            char c = pThreadBData->pThreadData->szDataBuffer[pThreadBData->pThreadData->iUsedBytes - 1];
+            pThreadBData->bytesProcessed[(unsigned char)c]++;
+            pThreadBData->pThreadData->iUsedBytes--;
+            pthread_mutex_unlock(&pThreadBData->pThreadData->mutex);
+        } else {
+            pthread_mutex_unlock(&pThreadBData->pThreadData->mutex);
+            // If the buffer is empty, sleep for a short time to avoid busy waiting
+            usleep(1000);
         }
         i++;
     }
-    printf("Thread B: Done processing data\n");
+
+    printf("Thread B: File processed\n");
     pthread_exit(NULL);
 }
-
