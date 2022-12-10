@@ -35,7 +35,7 @@ void printMenu(int length, char decorator){
     printf("4. Search by name\n");
     printf("5. Sum price of all reservations\n");
     printf("6. Print all reservations\n");
-    printf("7. Exit program\n");
+    printf("0. Exit program\n");
     printf("Enter choice: ");
 }
 

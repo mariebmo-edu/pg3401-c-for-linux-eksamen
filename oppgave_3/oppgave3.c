@@ -72,8 +72,6 @@ int main(int argc, char *argv[]){
 
 char getFirstCharOfUserInput(){
     char chFirstChar;
-    int iValidInput = 0;
-
     chFirstChar = getchar();
 
     clearInputStack();

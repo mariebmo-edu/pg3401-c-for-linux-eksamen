@@ -1,14 +1,14 @@
 INCLDIR = ./include
 CC = gcc
-CFLAGS = -O2
+CFLAGS = -O2 -pthread
 CFLAGS += -I$(INCLDIR)
 
 OBJDIR = obj
 
-_DEPS =
+_DEPS = oppgave5.h
 DEPS = $(patsubst %,$(INCLDIR)/%,$(_DEPS))
 
-_OBJS =
+_OBJS = oppgave5.o
 OBJS = $(patsubst %,$(OBJDIR)/%,$(_OBJS))
 
 $(OBJDIR)/%.o: %.c $(DEPS)
