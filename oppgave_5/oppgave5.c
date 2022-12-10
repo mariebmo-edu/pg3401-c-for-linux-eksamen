@@ -25,9 +25,6 @@ struct threadBData {
     unsigned int bytesProcessed[256];
 };
 
-void *threadAFunction(void *arg);
-void *threadBFunction(void *arg);
-
 int main(int argc, char *argv[]) {
 
     // Initialize the threadData structure and its mutex
