@@ -100,23 +100,36 @@ int validateInput(int returnCode){
 int validateDateInput(unsigned int iDateInput){
     struct tm time = getTmFromYYYYMMDD(iDateInput);
 
-    if(time.tm_year < 0 || time.tm_year > 9999 || time.tm_mon < 0 || time.tm_mon > 11 || time.tm_mday < 0 || time.tm_mday > 31){
+    //Ser om det er vits i å sjekke om datoen er gyldig
+    if(time.tm_year < 0
+            || time.tm_year > 9999
+            || time.tm_mon < 0
+            || time.tm_mon > 11
+            || time.tm_mday < 0
+            || time.tm_mday > 30){
         printf("Invalid date input\n");
         return 1;
     }
 
-    if(time.tm_mon == 1 || time.tm_mon == 3 || time.tm_mon == 5 || time.tm_mon == 7 || time.tm_mon == 8 || time.tm_mon == 10 || time.tm_mon == 12){
-        if(time.tm_mday > 31){
+    //Februar har 28 dager
+    if(time.tm_mon == 1) {
+        if (time.tm_mday > 27) {
             printf("Invalid date input\n");
             return 1;
         }
-    } else if(time.tm_mon == 4 || time.tm_mon == 6 || time.tm_mon == 9 || time.tm_mon == 11){
-        if(time.tm_mday > 30){
+    }
+
+    //Januar, mars, mai, juli, august, oktober og desember har 31 dager
+    if(time.tm_mon == 0 || time.tm_mon == 2 || time.tm_mon == 4 || time.tm_mon == 6 || time.tm_mon == 7 || time.tm_mon == 9 || time.tm_mon == 11) {
+        if (time.tm_mday > 30) {
             printf("Invalid date input\n");
             return 1;
         }
-    } else if(time.tm_mon == 2){
-        if(time.tm_mday > 28){
+    }
+
+    //April, juni, september og november har 30 dager
+    if(time.tm_mon == 3 || time.tm_mon == 5 || time.tm_mon == 8 || time.tm_mon == 10){
+        if(time.tm_mday > 29){
             printf("Invalid date input\n");
             return 1;
         }
