@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
 
 #include "include/reservation.h"
 #include "include/menu.h"
@@ -13,51 +15,50 @@ int main(int argc, char *argv[]){
 
     struct reservation *pHead = NULL;
     struct reservation *pTail = NULL;
-    initReservation(&pTail, &pHead);
 
     //Init test data
-    insertAfter(&pTail, "Trine", "1", 01012023, 5, 9.99);
-    insertAfter(&pTail, "Marie", "2", 02022022, 6, 12.99);
-    insertAfter(&pTail, "Kari", "3", 03032023, 7, 5.50);
-    insertAfter(&pTail, "Ole", "4", 09121992, 8, 20.3);
-    insertAfter(&pTail, "Per", "5", 01022033, 9, 59.90);
+    initReservation(&pHead, &pTail, "Trine", "1", 20231212, 5, 9.99);
+    insertAfter(&pTail, "Marie", "2", 20231224, 6, 12.99);
+    insertAfter(&pTail, "Kari", "3", 20221212, 7, 5.50);
+    insertAfter(&pTail, "Ole", "4", 20220512, 8, 20.3);
+    insertAfter(&pTail, "Per", "5", 20230112, 9, 59.90);
 
     char chChoice;
     int iDecoratorLength = 50;
-    char cDecorator = '~';
+    char chDecorator = '~';
     int iExit = 0;
 
     while(iExit == 0){
-        printMenu(iDecoratorLength, cDecorator);
+        printMenu(iDecoratorLength, chDecorator);
         chChoice = getFirstCharOfUserInput();
 
         switch (chChoice) {
             case '1':
-                printHeader("1. Add reservation", iDecoratorLength, cDecorator);
-                addReservationMenu(&pTail);
+                printHeader("1. Add reservation", iDecoratorLength, chDecorator);
+                addReservationMenu(&pHead, &pTail);
                 break;
             case '2':
-                printHeader("2. Delete last reservation", iDecoratorLength, cDecorator);
+                printHeader("2. Delete last reservation", iDecoratorLength, chDecorator);
                 deleteReservation(&pTail);
                 break;
             case '3':
-                printHeader("3. Delete all completed reservations", iDecoratorLength, cDecorator);
+                printHeader("3. Delete all completed reservations", iDecoratorLength, chDecorator);
                 deleteCompletedReservations(&pHead);
                 break;
             case '4':
-                printHeader("4. Search by name", iDecoratorLength, cDecorator);
+                printHeader("4. Search by name", iDecoratorLength, chDecorator);
                 searchByNameMenu(&pHead);
                 break;
             case '5':
-                printHeader("5. Sum price of all reservations", iDecoratorLength, cDecorator);
+                printHeader("5. Sum price of all reservations", iDecoratorLength, chDecorator);
                 sumPriceOfReservations(&pHead);
                 break;
             case '6':
-                printHeader("6. Print all reservations", iDecoratorLength, cDecorator);
+                printHeader("6. Print all reservations", iDecoratorLength, chDecorator);
                 printReservations(&pHead);
                 break;
             case '0':
-                printHeader("0. Exit", iDecoratorLength, cDecorator);
+                printHeader("0. Exit", iDecoratorLength, chDecorator);
                 iExit = 1;
 
                 break;
@@ -71,61 +72,99 @@ int main(int argc, char *argv[]){
 } // End main
 
 char getFirstCharOfUserInput(){
-    char chFirstChar;
-    chFirstChar = getchar();
+    char *szInput = NULL;
+    size_t iInputLength = 0;
 
-    clearInputStack();
+    if(getline(&szInput, &iInputLength, stdin) == -1){
+        printf("Error reading input");
+        exit(1);
+    }
+
+    char chFirstChar = szInput[0];
+    free(szInput);
 
     return chFirstChar;
 }
 
-int failedToReadInput(int returnCode){
+int validateInput(int returnCode){
 
     clearInputStack();
 
-    if(returnCode == 0){
+    if(returnCode == 1){
         printf("Failed to read input\n");
         return 1;
     }
     return 0;
 }
 
-void addReservationMenu(struct reservation **ppTail){
+int validateDateInput(unsigned int iDateInput){
+    struct tm time = getTmFromYYYYMMDD(iDateInput);
+
+    if(time.tm_year < 0 || time.tm_year > 9999 || time.tm_mon < 0 || time.tm_mon > 11 || time.tm_mday < 0 || time.tm_mday > 31){
+        printf("Invalid date input\n");
+        return 1;
+    }
+
+    if(time.tm_mon == 1 || time.tm_mon == 3 || time.tm_mon == 5 || time.tm_mon == 7 || time.tm_mon == 8 || time.tm_mon == 10 || time.tm_mon == 12){
+        if(time.tm_mday > 31){
+            printf("Invalid date input\n");
+            return 1;
+        }
+    } else if(time.tm_mon == 4 || time.tm_mon == 6 || time.tm_mon == 9 || time.tm_mon == 11){
+        if(time.tm_mday > 30){
+            printf("Invalid date input\n");
+            return 1;
+        }
+    } else if(time.tm_mon == 2){
+        if(time.tm_mday > 28){
+            printf("Invalid date input\n");
+            return 1;
+        }
+    } else {
+        return 0;
+    }
+}
+
+void addReservationMenu(struct reservation **ppHead, struct reservation **ppTail){
     char szName[128];
     char szRoomNr[3];
-    int iDate;
+    unsigned int iDate;
     int iDays;
     float fPricePerDay;
 
     printf("Enter name: ");
-    if(failedToReadInput(scanf("%s", szName))){
+    if(validateInput(scanf("%s", szName) != 1)){
         return;
     }
 
     printf("Enter room number: ");
-    if(failedToReadInput(scanf("%s", szRoomNr))){
+    if(validateInput(scanf("%s", szRoomNr) != 1)){
         return;
     }
 
     printf("Enter date (YYYYMMDD): ");
-    if(failedToReadInput(scanf("%d", &iDate))){
+    if(validateInput(scanf("%d", &iDate) != 1) || validateDateInput(iDate) == 1){
         return;
     }
 
     printf("Enter number of days: ");
-    if(failedToReadInput(scanf("%d", &iDays))){
+    if(validateInput(scanf("%d", &iDays) != 1)){
         return;
     }
 
     printf("Enter price per day: ");
-    if(failedToReadInput(scanf("%f", &fPricePerDay))){
+    if(validateInput(scanf("%f", &fPricePerDay) != 1)){
         return;
     }
 
-    if(insertAfter(ppTail, szName, szRoomNr, iDate, iDays, fPricePerDay)){
-        printSeparator(50, '-');
-        printf("Reservation added.\n");
-        printReservation(ppTail);
+    if(*ppHead == NULL && *ppTail == NULL){
+        initReservation(ppHead, ppTail, szName, szRoomNr, iDate, iDays, fPricePerDay);
+    } else {
+        if(insertAfter(ppTail, szName, szRoomNr, iDate, iDays, fPricePerDay)){
+            printSeparator(50, '-');
+            printf("Reservation added.\n");
+            printReservation(ppTail);
+        }
     }
 } // End addReservationMenu
 
@@ -133,7 +172,7 @@ void searchByNameMenu(struct reservation **ppHead){
     char szName[128];
 
     printf("Enter name: ");
-    if(failedToReadInput(scanf("%s", szName))){
+    if(validateInput(scanf("%s", szName) != 1)){
         return;
     }
 

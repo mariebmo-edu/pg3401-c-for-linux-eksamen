@@ -9,7 +9,7 @@
 int main(int argc, char *argv[]){
 
     FILE *fileIn, *fileOut;
-    char cCurrChar;
+    char chCurrChar;
 
     fileIn = fopen("input.txt", "r");
 
@@ -25,11 +25,11 @@ int main(int argc, char *argv[]){
         return 0;
     }
 
-    cCurrChar = fgetc(fileIn);
-    while(cCurrChar != EOF){
-        fprintf(fileOut, "%x", cCurrChar);
-        printf("%c : %x\n", cCurrChar, cCurrChar);
-        cCurrChar = fgetc(fileIn);
+    chCurrChar = fgetc(fileIn);
+    while(chCurrChar != EOF){
+        fprintf(fileOut, "%x", chCurrChar);
+        printf("%c : %x\n", chCurrChar, chCurrChar);
+        chCurrChar = fgetc(fileIn);
     }
 
     fclose(fileIn);

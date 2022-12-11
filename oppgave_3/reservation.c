@@ -4,20 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "include/menu.h"
-
+#include "include/reservation.h"
 
 // Head <-- next / prev --> Tail
-
-struct reservation {
-    struct reservation *pNext;
-    struct reservation *pPrev;
-    char szName[128];
-    char szRoomNr[6];
-    int iDate;
-    int iDays;
-    float fPricePerDay;
-};
 
 void clearAllocation(struct reservation **ppHead, struct reservation **ppTail){
     struct reservation *pTemp = *ppHead;
@@ -30,29 +21,38 @@ void clearAllocation(struct reservation **ppHead, struct reservation **ppTail){
     *ppTail = NULL;
 }
 
-void initReservation(struct reservation **ppTail, struct reservation **ppHead){
+int initReservation(struct reservation **ppHead, struct reservation **ppTail, char *pszName, char *pszRoomNr, int iDate, int iDays, float fPricePerDay){
 
     struct reservation *pNew = malloc(sizeof(struct reservation));
 
     if(pNew == NULL){
         printf("Error: Could not allocate memory for new reservation.\n");
-        return;
+        return 0;
     }
 
     pNew->pNext = NULL;
     pNew->pPrev = NULL;
+    pNew->iDate = iDate;
+    pNew->iDays = iDays;
+    pNew->fPricePerDay = fPricePerDay;
+    strcpy(pNew->szName, pszName);
+    strcpy(pNew->szRoomNr, pszRoomNr);
 
     *ppTail = pNew;
     *ppHead = pNew;
-}
 
-void insertBefore(struct reservation **ppBeforeRes, char *pszName, char *pszRoomNr, int iDate, int iDays, float fPricePerDay){
+    return 1;
+} // End initReservation
+
+int insertBefore(struct reservation **ppBeforeRes, char *pszName, char *pszRoomNr, int iDate, int iDays, float fPricePerDay){
+
+
 
     struct reservation *pNew = malloc(sizeof(struct reservation));
 
     if(pNew == NULL){
         printf("Error: Could not allocate memory for new reservation.\n");
-        return;
+        return 0;
     }
 
     pNew->pNext = NULL;
@@ -70,6 +70,8 @@ void insertBefore(struct reservation **ppBeforeRes, char *pszName, char *pszRoom
 
     (*ppBeforeRes)->pNext = pNew;
     *ppBeforeRes = pNew;
+
+    return 1;
 } // End insertBefore
 
 int insertAfter(struct reservation **ppAfterRes, char *pszName, char *pszRoomNr, int iDate, int iDays, float fPricePerDay){
@@ -125,17 +127,27 @@ void deleteReservation(struct reservation **ppReservation){
 
 void deleteCompletedReservations(struct reservation **ppHead){
 
-        struct reservation *pTemp = *ppHead;
+    struct reservation *pTemp = *ppHead;
+    time_t dateToday = time(NULL);
 
-        while(pTemp != NULL){
 
-            DateTime dTNow = DateTime.Now;
-            int iNow = Convert.ToInt32(dTNow.ToString("ddMMyyyy"));
+    while(pTemp != NULL){
 
-            if(pTemp->iDate + pTemp->iDays < 20221209){
+            struct tm date = getTmFromYYYYMMDD(pTemp->iDate);
+
+            date.tm_mday += pTemp->iDays;
+
+            time_t dateReservationFinished = mktime(&date);
+
+            if(dateReservationFinished < dateToday){
+
+                struct reservation *pPrev = pTemp->pPrev;
                 deleteReservation(&pTemp);
+
+                pTemp = pPrev;
+            } else {
+                pTemp = pTemp->pPrev;
             }
-            pTemp = pTemp->pPrev;
         }
 }
 
@@ -149,12 +161,7 @@ void searchReservationByName(struct reservation **ppHead, char *pName){
             if(iFoundAtLeastOne == 1){
                 printSeparator(50, '-');
             }
-            printf("Reservation found:\n");
-            printf("Name: %s\n", pTemp->szName);
-            printf("Room number: %s\n", pTemp->szRoomNr);
-            printf("Date: %d\n", pTemp->iDate);
-            printf("Days: %d\n", pTemp->iDays);
-            printf("Price per day: %f\n", pTemp->fPricePerDay);
+            printReservation(&pTemp);
             iFoundAtLeastOne = 1;
         }
         pTemp = pTemp->pPrev;
@@ -184,11 +191,7 @@ void printReservations(struct reservation **ppHead){
     printf("HEAD\n");
 
     while(pCurr != NULL){
-        printf("Name: %s\n", pCurr->szName);
-        printf("Room number: %s\n", pCurr->szRoomNr);
-        printf("Date: %d\n", pCurr->iDate);
-        printf("Days: %d\n", pCurr->iDays);
-        printf("Price per day: %f\n", pCurr->fPricePerDay);
+        printReservation(&pCurr);
         printSeparator(50, '-');
         pCurr = pCurr->pPrev;
     }
@@ -198,11 +201,30 @@ void printReservations(struct reservation **ppHead){
 void printReservation(struct reservation **ppReservation){
 
     struct reservation *pCurr = *ppReservation;
+    struct tm date = getTmFromYYYYMMDD(pCurr->iDate);
 
     printf("Name: %s\n", pCurr->szName);
     printf("Room number: %s\n", pCurr->szRoomNr);
-    printf("Date: %d\n", pCurr->iDate);
+    printf("Date: ");
+    printDate(&date);
     printf("Days: %d\n", pCurr->iDays);
     printf("Price per day: %f\n", pCurr->fPricePerDay);
+}
+
+struct tm getTmFromYYYYMMDD(unsigned int iDate){
+    struct tm date;
+    memset(&date, 0, sizeof(struct tm));
+
+    date.tm_year = iDate / 10000 - 1900;
+    date.tm_mon = iDate % 10000 / 100 - 1;
+    date.tm_mday = iDate % 100;
+
+    return date;
+}
+
+void printDate(struct tm *pTmDate){
+
+    char szFormattedDate[20];
+    printf("%s\n", szFormattedDate);
 }
 

@@ -7,7 +7,7 @@
 
 int handleMenu();
 char getFirstCharOfUserInput();
-void addReservationMenu(struct reservation **ppTail);
+void addReservationMenu(struct reservation **ppHead, struct reservation **ppTail);
 void searchByNameMenu(struct reservation **ppHead);
 void clearInputStack();
 

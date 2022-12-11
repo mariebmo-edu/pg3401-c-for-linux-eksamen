@@ -2,7 +2,7 @@
 // Created by marie on 08.12.2022.
 //
 
-#ifndef CFORLINUXEKSAMEN_OPPGAVE2_H
-#define CFORLINUXEKSAMEN_OPPGAVE2_H
+#ifndef __OPPGAVE2_H__
+#define __OPPGAVE2_H__
 
-#endif //CFORLINUXEKSAMEN_OPPGAVE2_H
+#endif //__OPPGAVE2_H__
