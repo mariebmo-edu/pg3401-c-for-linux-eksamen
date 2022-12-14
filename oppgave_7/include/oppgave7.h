@@ -1,0 +1,8 @@
+//
+// Created by marie on 14.12.2022.
+//
+
+#ifndef PG3401_H22_1012_OPPGAVE7_H
+#define PG3401_H22_1012_OPPGAVE7_H
+
+#endif //PG3401_H22_1012_OPPGAVE7_H

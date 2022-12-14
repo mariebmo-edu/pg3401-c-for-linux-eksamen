@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-
-
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -72,27 +70,28 @@ int main(int argc, char *argv[]){
     sscanf(szServerResponse, "Content-Length: %lu\n", &ulBytesReceived);
     printf("Bytes received: %lu\n", ulBytesReceived);
 
+    if(ulBytesReceived > 0){
+        FILE *fp = fopen(szFileName, "w+");
 
-    FILE *fp = fopen(szFileName, "w+");
+        if(fp == NULL){
+            perror("ERROR opening file\n");
+            exit(1);
+        }
 
-    if(fp == NULL){
-        perror("ERROR opening file\n");
-        exit(1);
+        unsigned long ulBytesRemaining = ulBytesReceived;
+        char fileContent[BUFFER_SIZE];
+        int iBytesRead;
+
+        while (ulBytesRemaining > 0 && (iBytesRead = read(sockClientFd, fileContent, BUFFER_SIZE)) > 0) {
+            printf("Bytes read: %d\n", iBytesRead);
+            fwrite(fileContent, 1, iBytesRead, fp);
+            ulBytesRemaining -= iBytesRead;
+        }
+
+        fclose(fp);
     }
 
-    unsigned long ulBytesRemaining = ulBytesReceived;
-    char fileContent[BUFFER_SIZE];
-    int iBytesRead;
-
-    while (ulBytesRemaining > 0 && (iBytesRead = read(sockClientFd, fileContent, BUFFER_SIZE)) > 0) {
-        printf("Bytes read: %d\n", iBytesRead);
-        fwrite(fileContent, 1, iBytesRead, fp);
-        ulBytesRemaining -= iBytesRead;
-    }
-
-    fclose(fp);
     printf("Message received from server: %s\n", szServerResponse);
-
     close(sockClientFd);
 
     return 0;
