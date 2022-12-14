@@ -14,7 +14,7 @@ OBJS = $(patsubst %,$(OBJDIR)/%,$(_OBJS))
 $(OBJDIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-oppgave6client: $(OBJS)
+oppgave6_client: $(OBJS)
 	gcc -o $@ $^ $(CFLAGS)
 
 .PHONY: clean

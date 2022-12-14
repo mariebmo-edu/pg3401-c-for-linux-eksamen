@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/sendfile.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
@@ -23,14 +24,16 @@
 
 int main(int argc, char *argv[]) {
 
-    char webpage[] = "HTTP/1.1 200 OK\r\n Content-Type: text/html; charset=UTF-8\r\n\r\n <!DOCTYPE html> <html> <head> <title>HTTP Server</title> </head> <body> <h1>HTTP Server</h1> <p> This is a HTTP server </p> </body> </html>\r\n\r\n";
-    char szBuffer[BUFFER_SIZE];
+    printf("Starting server %s:%d ...\n", ADDRESS, PORT);
 
-    printf("Starting server %s:%d ...", ADDRESS, PORT);
+    char webpage[] = "HTTP/1.1 200 OK\r\n Content-Type: text/html; charset=UTF-8\r\n\r\n <!DOCTYPE html> <html> <head> <title>HTTP Server</title> </head> <body> <h1>HTTP Server</h1> <p> File not found </p> </body> </html>\r\n\r\n";
+    char szBuffer[BUFFER_SIZE];
+    char szFileName[128];
+    char szResponseHeader[256];
 
     int sockServerFd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockServerFd < 0) {
-        perror("ERROR opening socket");
+        perror("ERROR opening socket\n");
         exit(1);
     }
 
@@ -40,13 +43,13 @@ int main(int argc, char *argv[]) {
     saServerAddr.sin_addr.s_addr = inet_addr(ADDRESS);
 
     if (bind(sockServerFd, (struct sockaddr *) &saServerAddr, sizeof(saServerAddr)) < 0) {
-        perror("ERROR binding to socket");
+        perror("ERROR binding to socket\n");
         close(sockServerFd);
         exit(1);
     }
 
     if(listen(sockServerFd, 5) < 0) {
-        perror("ERROR listening to socket");
+        perror("ERROR listening to socket\n");
         close(sockServerFd);
         exit(1);
     }
@@ -55,34 +58,58 @@ int main(int argc, char *argv[]) {
         int clientFd = accept(sockServerFd, (struct sockaddr *) NULL, NULL);
 
         if (clientFd < 0) {
-            perror("ERROR accepting connection");
+            perror("ERROR accepting connection\n");
             continue;
         }
 
-        printf("Connection accepted");
+        printf("Connection accepted\n");
+
         if(!fork()) {
-            printf("Child process created");
+            printf("Child process created\n");
             close(sockServerFd);
             memset(szBuffer, 0, BUFFER_SIZE);
 
             if(read(clientFd, szBuffer, BUFFER_SIZE) < 0) {
-                perror("ERROR reading from socket");
+                perror("ERROR reading from socket\n");
                 close(clientFd);
                 exit(1);
             }
+
+            sscanf(szBuffer, "GET /%s HTTP/1.1", szFileName);
+
+            printf("Requested file: %s\n", szFileName);
 
             printf("%s", szBuffer);
 
-            if(write(clientFd, webpage, sizeof(webpage) - 1) < 0) {
-                perror("ERROR writing to socket");
-                close(clientFd);
-                exit(1);
+            if(access(szFileName, F_OK) < 0){
+                printf("File not found\n");
+                if(write(clientFd, webpage, sizeof(webpage) - 1) < 0) {
+                    perror("ERROR writing to socket\n");
+                    close(clientFd);
+                    exit(1);
+                }
+            } else {
+                printf("File found\n");
+                int fd = open(szFileName, O_RDONLY);
+                struct stat stFileInfo;
+                fstat(fd, &stFileInfo);
+
+                sprintf(szResponseHeader, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n", stFileInfo.st_size);
+                if(write(clientFd, szResponseHeader, strlen(szResponseHeader)) < 0) {
+                    perror("ERROR sending header to client\n");
+                    close(clientFd);
+                    exit(1);
+                }
+                sendfile(clientFd, fd, NULL, stFileInfo.st_size);
             }
 
+
+
             close(clientFd);
-            printf("Connection closed");
+            printf("Client -  Connection closed\n");
             exit(0);
         }
         close(clientFd);
+        printf("Client -  Connection closed\n");
     }
 }
