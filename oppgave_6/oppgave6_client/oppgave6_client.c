@@ -20,52 +20,49 @@
 #define BUFFER_SIZE 1024 // Size of buffer to use
 
 int main(int iArgc, char *apszArgv[]){
-    int sockFd;
-    struct sockaddr_in saAddr;
+    int sockClientFd;
+    struct sockaddr_in saClientAddr;
+    char szServerResponse[BUFFER_SIZE];
+    char szMessage[] = "GET / HTTP/1.1\r\n\r\n";
 
-    if((sockFd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+    if((sockClientFd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
         perror("ERROR opening socket");
         exit(1);
     }
 
-    memset(&saAddr, 0, sizeof(saAddr));
+    memset(&saClientAddr, 0, sizeof(saClientAddr));
 
-    saAddr.sin_family = AF_INET;
-    saAddr.sin_port = htons(PORT);
-    saAddr.sin_addr.s_addr = inet_addr(ADDRESS);
+    saClientAddr.sin_family = AF_INET;
+    saClientAddr.sin_port = htons(PORT);
+    saClientAddr.sin_addr.s_addr = inet_addr(ADDRESS);
 
-    if(connect(sockFd, (struct sockaddr *) &saAddr, sizeof(saAddr)) < 0){
+    printf("Connecting to server %s:%d ...", ADDRESS, PORT);
+    if(connect(sockClientFd, (struct sockaddr *) &saClientAddr, sizeof(saClientAddr)) < 0){
         perror("ERROR connecting to socket");
         exit(1);
     }
 
-    ReceiveHttpGetReply(sockFd);
+    printf("Connected to server %s:%d", ADDRESS, PORT);
 
-    close(sockFd);
-
-    return 0;
-}
-
-void ReceiveHttpGetReply(int sockFd) {
-    char szBuffer[BUFFER_SIZE];
-    int n;
-
-    memset(szBuffer, 0, BUFFER_SIZE);
-    n = 0;
-
-    while((szBuffer[n++] = getchar()) != EOF);
-
-    if(write(sockFd, szBuffer, strlen(szBuffer)) < 0){
-        perror("ERROR writing to socket");
+    if(send(sockClientFd, szMessage, strlen(szMessage), 0) < 0){
+        perror("ERROR sending message to socket");
         exit(1);
     }
 
-    memset(szBuffer, 0, BUFFER_SIZE);
-    n = read(sockFd, szBuffer, BUFFER_SIZE);
-    printf("From server: %s\n", szBuffer);
-    if((strncmp(szBuffer, "exit", 4)) == 0){
-        printf("Client Exit...\n");
+    printf("Message sent to server");
+
+    memset(szServerResponse, 0, BUFFER_SIZE);
+
+    if(recv(sockClientFd, szServerResponse, BUFFER_SIZE, 0) < 0){
+        perror("ERROR receiving message from socket");
+        exit(1);
     }
+
+    printf("Message received from server: %s", szServerResponse);
+
+    close(sockClientFd);
+
+    return 0;
 }
 
 /* End of file ------------------------------------------------------------------------------*/

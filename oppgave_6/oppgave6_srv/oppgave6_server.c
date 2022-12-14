@@ -26,8 +26,10 @@ int main(int argc, char *argv[]) {
     char webpage[] = "HTTP/1.1 200 OK\r\n Content-Type: text/html; charset=UTF-8\r\n\r\n <!DOCTYPE html> <html> <head> <title>HTTP Server</title> </head> <body> <h1>HTTP Server</h1> <p> This is a HTTP server </p> </body> </html>\r\n\r\n";
     char szBuffer[BUFFER_SIZE];
 
-    int sockFd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockFd < 0) {
+    printf("Starting server %s:%d ...", ADDRESS, PORT);
+
+    int sockServerFd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockServerFd < 0) {
         perror("ERROR opening socket");
         exit(1);
     }
@@ -37,20 +39,20 @@ int main(int argc, char *argv[]) {
     saServerAddr.sin_port = htons(PORT);
     saServerAddr.sin_addr.s_addr = inet_addr(ADDRESS);
 
-    if (bind(sockFd, (struct sockaddr *) &saServerAddr, sizeof(saServerAddr)) < 0) {
+    if (bind(sockServerFd, (struct sockaddr *) &saServerAddr, sizeof(saServerAddr)) < 0) {
         perror("ERROR binding to socket");
-        close(sockFd);
+        close(sockServerFd);
         exit(1);
     }
 
-    if(listen(sockFd, 5) < 0) {
+    if(listen(sockServerFd, 5) < 0) {
         perror("ERROR listening to socket");
-        close(sockFd);
+        close(sockServerFd);
         exit(1);
     }
 
     while(1) {
-        int clientFd = accept(sockFd, (struct sockaddr *) NULL, NULL);
+        int clientFd = accept(sockServerFd, (struct sockaddr *) NULL, NULL);
 
         if (clientFd < 0) {
             perror("ERROR accepting connection");
@@ -60,7 +62,7 @@ int main(int argc, char *argv[]) {
         printf("Connection accepted");
         if(!fork()) {
             printf("Child process created");
-            close(sockFd);
+            close(sockServerFd);
             memset(szBuffer, 0, BUFFER_SIZE);
 
             if(read(clientFd, szBuffer, BUFFER_SIZE) < 0) {
@@ -83,5 +85,4 @@ int main(int argc, char *argv[]) {
         }
         close(clientFd);
     }
-
 }
