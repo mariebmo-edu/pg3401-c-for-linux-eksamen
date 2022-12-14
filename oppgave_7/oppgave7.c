@@ -96,19 +96,22 @@ int main(int argc, char *argv[]) {
             printf("AfterLoop: %s\n", afterLoop);
 
             if(beforeLoop != NULL && strlen(beforeLoop) > 0){
-                iIndentation = strlen(beforeLoop) + 4;
+                iIndentation = strlen(beforeLoop);
             }
 
             strncpy(updateCondition, update, updateLength+1);
             updateCondition[updateLength] = '\0';
 
-            fputs(beforeLoop, fileOut);
-            fputs(init, fileOut);
-            fputs(";\n", fileOut);
-            fputs(beforeLoop, fileOut);
-            fputs("while(", fileOut);
-            fputs(condition, fileOut);
-            fputs("){\n", fileOut);
+            char initOutput[strlen(init) + 2];
+            sprintf(initOutput, "%s%s", init, ";\n");
+
+            char conditionOutput[strlen(condition) + 9];
+            sprintf(conditionOutput, "%s%s%s", "while(", condition, "){\n");
+
+            addIndentation(fileOut, iIndentation);
+            fputs(initOutput, fileOut);
+            addIndentation(fileOut, iIndentation);
+            fputs(conditionOutput, fileOut);
 
             iIsInCurrentMatch++;
         } else {
@@ -116,7 +119,7 @@ int main(int argc, char *argv[]) {
 
             if(regexec(&regexForCurlyBraceEnd, line, 0, NULL, 0) == 0 && iIsInCurrentMatch > 0){
                 printf("Found curly brace end: %s", line);
-                addIndentation(fileOut, iIndentation);
+                addIndentation(fileOut, iIndentation+4);
                 fputs(updateCondition, fileOut);
                 fputs(";\n", fileOut);
                 fputs(line, fileOut);
@@ -155,3 +158,6 @@ void addIndentation(FILE *fileOut, int iIndentation) {
         fputc(' ', fileOut);
     }
 }
+
+//should get a line and replace all tabs with THREE spaces
+
