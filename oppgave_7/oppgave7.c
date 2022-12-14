@@ -140,6 +140,7 @@ int main(int argc, char *argv[]) {
 
     regfree(&regexForLoop);
     regfree(&regexForTab);
+    regfree(&regexForCurlyBraceEnd);
     fclose(fileIn);
     fclose(fileOut);
     return 0;
@@ -159,5 +160,4 @@ void addIndentation(FILE *fileOut, int iIndentation) {
     }
 }
 
-//should get a line and replace all tabs with THREE spaces
 
