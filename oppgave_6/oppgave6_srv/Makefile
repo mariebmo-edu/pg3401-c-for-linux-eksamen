@@ -5,16 +5,16 @@ CFLAGS += -I$(INCLDIR)
 
 OBJDIR = obj
 
-_DEPS =
+_DEPS = oppgave6_server.h
 DEPS = $(patsubst %,$(INCLDIR)/%,$(_DEPS))
 
-_OBJS =
+_OBJS = oppgave6_server.o
 OBJS = $(patsubst %,$(OBJDIR)/%,$(_OBJS))
 
 $(OBJDIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-oppgave6: $(OBJS)
+oppgave6_server: $(OBJS)
 	gcc -o $@ $^ $(CFLAGS)
 
 .PHONY: clean
