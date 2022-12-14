@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
         printf("It works with multiple lines");
         printf("And multiple statements");
 
-        for(int i = 0; i < 10; i++){
+        for(int k = 0; k < 10; k++){
             printf("And nested statements?");
         }
 
