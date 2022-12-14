@@ -18,8 +18,8 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    char fileName[sizeof(argv[1])];
-    char newFileName[sizeof(argv[1]) + 12];
+    char fileName[strlen(argv[1])];
+    char newFileName[(strlen(argv[1]) + 12)];
     regex_t regexForLoop, regexForTab, regexForCurlyBraceEnd;
     int iRegexResult;
 
@@ -99,15 +99,16 @@ int main(int argc, char *argv[]) {
                 strcpy(szCurrentIndentation, beforeLoop);
             }
 
-            strncpy(updateCondition, update, updateLength);
+            strncpy(updateCondition, update, updateLength+1);
+            updateCondition[updateLength] = '\0';
 
-            fwrite(beforeLoop, sizeof(char), beforeLoopLength, fileOut);
-            fwrite(init, sizeof(char), initLength, fileOut);
-            fwrite(";\n", sizeof(char), 2, fileOut);
-            fwrite(beforeLoop, sizeof(char), beforeLoopLength, fileOut);
-            fwrite("while (", sizeof(char), 7, fileOut);
-            fwrite(condition, sizeof(char), conditionLength, fileOut);
-            fwrite(")\n", sizeof(char), 2, fileOut);
+            fputs(beforeLoop, fileOut);
+            fputs(init, fileOut);
+            fputs(";\n", fileOut);
+            fputs(beforeLoop, fileOut);
+            fputs("while(", fileOut);
+            fputs(condition, fileOut);
+            fputs("){\n", fileOut);
 
             iIsInCurrentMatch = 1;
         } else {
@@ -115,11 +116,11 @@ int main(int argc, char *argv[]) {
 
             if(regexec(&regexForCurlyBraceEnd, line, 0, NULL, 0) == 0 && iIsInCurrentMatch == 1){
                 printf("Found curly brace end: %s", line);
-                fwrite(szCurrentIndentation, sizeof(char), strlen(szCurrentIndentation), fileOut);
-                fwrite(updateCondition, sizeof(char), strlen(updateCondition), fileOut);
-                fwrite("\n", sizeof(char), 1, fileOut);
-                fwrite(szCurrentIndentation, sizeof(char), strlen(szCurrentIndentation), fileOut);
-                fwrite("}\n", sizeof(char), 2, fileOut);
+                fputs(szCurrentIndentation, fileOut);
+                fputs("    ", fileOut);
+                fputs(updateCondition, fileOut);
+                fputs(";\n", fileOut);
+                fputs(line, fileOut);
                 iIsInCurrentMatch = 0;
             } else {
                 fwrite(line, sizeof(char), strlen(line), fileOut);
