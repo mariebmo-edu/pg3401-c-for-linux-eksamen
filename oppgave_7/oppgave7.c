@@ -10,6 +10,7 @@
 #define LINE_LENGTH 1024
 
 void createBeautifiedFileName(char *fileName, char *newFileName);
+void addIndentation(FILE *fileOut, int iIndentation);
 
 int main(int argc, char *argv[]) {
 
@@ -21,7 +22,7 @@ int main(int argc, char *argv[]) {
     char fileName[strlen(argv[1])];
     char newFileName[(strlen(argv[1]) + 12)];
     regex_t regexForLoop, regexForTab, regexForCurlyBraceEnd;
-    int iRegexResult;
+    int iRegexResult, iIndentation;
 
     strcpy(fileName, argv[1]);
     createBeautifiedFileName(fileName, newFileName);
@@ -56,7 +57,6 @@ int main(int argc, char *argv[]) {
     char ch;
     char updateCondition[LINE_LENGTH];
     int iIsInCurrentMatch = 0;
-    char szCurrentIndentation[LINE_LENGTH];
 
     while(fgets(line, LINE_LENGTH, fileIn) != NULL) {
 
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
             printf("AfterLoop: %s\n", afterLoop);
 
             if(beforeLoop != NULL && strlen(beforeLoop) > 0){
-                strcpy(szCurrentIndentation, beforeLoop);
+                iIndentation = strlen(beforeLoop) + 4;
             }
 
             strncpy(updateCondition, update, updateLength+1);
@@ -110,18 +110,18 @@ int main(int argc, char *argv[]) {
             fputs(condition, fileOut);
             fputs("){\n", fileOut);
 
-            iIsInCurrentMatch = 1;
+            iIsInCurrentMatch++;
         } else {
             printf("Found something else: %s", line);
 
-            if(regexec(&regexForCurlyBraceEnd, line, 0, NULL, 0) == 0 && iIsInCurrentMatch == 1){
+            if(regexec(&regexForCurlyBraceEnd, line, 0, NULL, 0) == 0 && iIsInCurrentMatch > 0){
                 printf("Found curly brace end: %s", line);
-                fputs(szCurrentIndentation, fileOut);
-                fputs("    ", fileOut);
+                addIndentation(fileOut, iIndentation);
                 fputs(updateCondition, fileOut);
                 fputs(";\n", fileOut);
                 fputs(line, fileOut);
-                iIsInCurrentMatch = 0;
+                iIsInCurrentMatch--;
+                iIndentation -= 4;
             } else {
                 fwrite(line, sizeof(char), strlen(line), fileOut);
             }
@@ -148,4 +148,10 @@ void createBeautifiedFileName(char *fileName, char *newFileName) {
         i++;
     }
     strcat(newFileName, "_beautified.c");
+}
+
+void addIndentation(FILE *fileOut, int iIndentation) {
+    for(int i = 0; i < iIndentation; i++){
+        fputc(' ', fileOut);
+    }
 }
