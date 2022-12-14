@@ -27,18 +27,27 @@ int main(int argc, char *argv[]) {
     strcpy(fileName, argv[1]);
     createBeautifiedFileName(fileName, newFileName);
 
+    //Regex matching lines with for loops, groups:
+    // 0: whole line,
+    // 1: characters before "for("
+    // 2: initialisation statement (int i = 0)
+    // 3: condition statement (i < 10)
+    // 4: increment statement (i++)
+    // 5: characters after "){"
     iRegexResult = regcomp(&regexForLoop, "(\\s*)for\\s*\\(\\s*([^;]*);\\s*([^;]*);\\s*([^\\)]*)\\)\\s*(\\{\\s*)", REG_EXTENDED);
     if (iRegexResult) {
         printf("Could not compile forloop regex");
         return 1;
     }
 
+    //Regex matching lines with tabs
     iRegexResult = regcomp(&regexForTab, "\\t", REG_EXTENDED);
     if (iRegexResult) {
         printf("Could not compile tab regex");
         return 1;
     }
 
+    //Regex matching lines with }
     iRegexResult = regcomp(&regexForCurlyBraceEnd, "\\s*\\}\\s*", REG_EXTENDED);
     if (iRegexResult) {
         printf("Could not compile curly braces regex");
@@ -63,7 +72,6 @@ int main(int argc, char *argv[]) {
         regmatch_t regMatches[6];
 
         if(regexec(&regexForLoop, line, 6, regMatches, 0) == 0){
-            printf("Found for loop: %s", line);
 
             size_t beforeLoopLength = regMatches[1].rm_eo - regMatches[1].rm_so;
             size_t initLength = regMatches[2].rm_eo - regMatches[2].rm_so;
@@ -89,12 +97,6 @@ int main(int argc, char *argv[]) {
             update[updateLength] = '\0';
             afterLoop[afterLoopLength] = '\0';
 
-            printf("beforeLoop: %s\n", beforeLoop);
-            printf("Init: %s\n", init);
-            printf("Condition: %s\n", condition);
-            printf("Update: %s\n", update);
-            printf("AfterLoop: %s\n", afterLoop);
-
             if(beforeLoop != NULL && strlen(beforeLoop) > 0){
                 iIndentation = strlen(beforeLoop);
             }
@@ -115,10 +117,7 @@ int main(int argc, char *argv[]) {
 
             iIsInCurrentMatch++;
         } else {
-            printf("Found something else: %s", line);
-
             if(regexec(&regexForCurlyBraceEnd, line, 0, NULL, 0) == 0 && iIsInCurrentMatch > 0){
-                printf("Found curly brace end: %s", line);
                 addIndentation(fileOut, iIndentation+4);
                 fputs(updateCondition, fileOut);
                 fputs(";\n", fileOut);
@@ -129,13 +128,6 @@ int main(int argc, char *argv[]) {
                 fwrite(line, sizeof(char), strlen(line), fileOut);
             }
         }
-
-        for(int i = 0; i < strlen(line); i++){
-            ch = line[i];
-            if(ch == '\t'){
-                printf("Found tab\n");
-            }
-        }
     }
 
     regfree(&regexForLoop);
@@ -143,6 +135,8 @@ int main(int argc, char *argv[]) {
     regfree(&regexForCurlyBraceEnd);
     fclose(fileIn);
     fclose(fileOut);
+
+    printf("Beautified file %s created\n", newFileName);
     return 0;
 }
 void createBeautifiedFileName(char *fileName, char *newFileName) {
