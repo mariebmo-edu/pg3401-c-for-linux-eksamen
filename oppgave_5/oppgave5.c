@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
     // Avslutter mutex, og avslutter programmet.
     pthread_mutex_destroy(&threadData.mutex);
 
-    return 1;
+    return 0;
 }
 
 void* threadAFunction(void* pData) {
