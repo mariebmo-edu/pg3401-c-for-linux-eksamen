@@ -1,7 +1,6 @@
 //
-// Created by marie on 08.12.2022.
+// Created by 1012
 //
-
 #ifndef __OPPGAVE2_H__
 #define __OPPGAVE2_H__
 
