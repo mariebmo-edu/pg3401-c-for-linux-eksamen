@@ -139,6 +139,7 @@ int validateDayInput(int day, int month) {
     return 0;
 }
 
+// Sjekker at iDateInput er et gyldig datoformat
 int validateDateInput(unsigned int iDateInput){
     struct tm time = getTmFromYYYYMMDD(iDateInput);
 
@@ -184,9 +185,6 @@ int addDateMenu(int *iDateInput){
         }
     }
 
-    printf("Year: %s\n", szYear);
-    printf("Current date: %s\n", szDate);
-
     iValidInput = 0;
     printf("Enter a month (MM): \n");
     printf("1. January\n");
@@ -217,9 +215,6 @@ int addDateMenu(int *iDateInput){
         }
     }
 
-    printf("Month: %s\n", szMonth);
-    printf("Current date: %s\n", szDate);
-
     iValidInput = 0;
     printf("Enter a day (DD): ");
     while(!iValidInput){
@@ -241,9 +236,6 @@ int addDateMenu(int *iDateInput){
         }
     }
 
-    printf("Day: %s\n", szDay);
-    printf("Current date: %s\n", szDate);
-
     if(validateDateInput(atoi(szDate)) == 0){
         *iDateInput = atoi(szDate);
         return 0;
@@ -255,13 +247,13 @@ int addDateMenu(int *iDateInput){
 
 void addReservationMenu(struct reservation **ppHead, struct reservation **ppTail){
     char szName[128];
-    char szRoomNr[3];
-    char szBuffer[8];
+    char szRoomNr[4];
+    char szBuffer[5];
 
     unsigned int iDate;
     int iDays;
     float fPricePerDay;
-    int iValidInput = 0;
+    int iValidInput;
 
     iValidInput = 0;
     printf("Enter name: ");
@@ -327,7 +319,7 @@ void addReservationMenu(struct reservation **ppHead, struct reservation **ppTail
 } // End addReservationMenu
 
 void searchByNameMenu(struct reservation **ppHead){
-    char szName[128];
+    char szName[129];
 
     printf("Enter name: ");
     if(input(szName, sizeof(szName)) == 1){
@@ -337,46 +329,14 @@ void searchByNameMenu(struct reservation **ppHead){
     searchReservationByName(ppHead, szName);
 }
 
-void clearInputStack(){
-    char chRestOfLine;
-    int iStackEmpty = 0;
-
-    while(iStackEmpty == 0){
-        chRestOfLine = getchar();
-        if(chRestOfLine == '\n' || chRestOfLine == EOF){
-            iStackEmpty = 1;
-        }
-    }
-}
-
-void handleNewLine(char *szInput, int iLength){
-    int iStackEmpty = 0;
-
-    int i = 0;
-    while(i < iLength){
-
-        if(szInput[i] == '\n'){
-            szInput[i] = '\0';
-            break;
-        }
-        i++;
-    }
-}
-
 int input(char *szInput, int iLength){
 
     int c;
-
-    printf("Input before: %s\n", szInput);
-    printf("Length: %d\n", iLength);
-
     char *input = fgets(szInput, iLength, stdin);
 
     int i = 0;
     int iInWhile = 1;
 
-    printf("Input: %s\n", szInput);
-    printf("Length: %lu\n", strlen(szInput));
     while(iInWhile && i < iLength){
 
         if(szInput[i] == '\n'){
@@ -386,9 +346,7 @@ int input(char *szInput, int iLength){
         i++;
     }
 
-    while ((c = getchar()) != '\n' && c != EOF);
-
-    printf("\n");
+    while ((c = getchar()) != '\n' && c != EOF && c != '\0');
 
     if(input == NULL){
         return 1;
