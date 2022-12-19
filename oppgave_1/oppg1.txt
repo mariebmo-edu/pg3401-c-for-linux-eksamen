@@ -4,14 +4,17 @@ a) Forklar hva C programmeringsspråket kan brukes til
 
 Programmeringsspråket C kan brukes til nesten alt. Siden C jobber direkte mot minnet, er språket spesielt godt egnet til å skrive kode der minnehåndtering og effektivitet er i fokus.
 Dette kan være alt fra små embedded-maskiner uten mye minneplass, til algoritmiske utregninger. C er grunnlaget i flere nyere programmeringsspråk, som gjør at man kan implementere C-biblioteker dersom man trenger at deler av koden skal utføres spesielt effektivt.
+C er også et språk som blir brukt for å lære programmering, da det gir en god forståelse av hvordan datamaskin fungerer.
 ---
 
 b) Hvem er Linus Torvalds, og hva er han kjent for innen informasjonsteknologi?
 
-Linus Torvalds står bak operativsystemet "Linux" - en open source kernel som i senere tid har blitt brukt til flere operativsystemer. Han står også bak versjonshånderingsteknologien GIT.
+Linus Torvalds står bak Linux-kjernen (Linux står for Linus sin unix), som er et operativsystem som er basert på unix. Han startet utviklingen som en hobby i 1991, og har siden jobbet med å utvikle og forbedre Linux. Linux er et av de mest brukte operativsystemene i verden, og brukes i alt fra mobiltelefoner til superdatamaskiner.
+Torvalds er også kjent for å ha startet utviklingen av Git, et verktøy for å holde styr på endringer i kildekode.
 ---
 
 c) Forklar hva verktøyet valgrind brukes til når man programmerer på Linux
 
-Valgrind er et verktøy som benyttes for å finne minnelekasjer i kode på linux.
+Valgrind er et verktøy som analyserer kode som kjøres på Linux. Det kan brukes til å finne feil og problemer i kode, med fokus på minnebruk og ytelse. Valgrind er spesielt egnet til å finne minnelekkasjer som oppstår når man glemmer å frigjøre minne man har allokert.
+Når man kjører Valgrind, så kjører den koden som en del av sin egen prosess, og overvåker koden som kjøres. Når programmet er avsluttes lagrer Valgrind en rapport som viser hvor i koden det oppstod problemer, slik at utvikleren kan fikse feilen.
 ---

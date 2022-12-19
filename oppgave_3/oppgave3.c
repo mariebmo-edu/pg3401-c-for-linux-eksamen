@@ -6,10 +6,10 @@
 #include <string.h>
 #include <time.h>
 
-
 #include "include/reservation.h"
 #include "include/menu.h"
 #include "include/oppgave3.h"
+#include "include/dateTimeHandling.h"
 
 int main(int argc, char *argv[]){
 
@@ -86,88 +86,233 @@ char getFirstCharOfUserInput(){
     return chFirstChar;
 }
 
-int validateInput(int returnCode){
-
-    clearInputStack();
-
-    if(returnCode == 1){
-        printf("Failed to read input\n");
+int validateYearInput(int year) {
+    if (year < 1000) {
+        printf("Year must be 4 digits\n");
         return 1;
     }
+
+    if (year > 9999) {
+        printf("Year must be less than 9999\n");
+        return 1;
+    }
+
+    return 0;
+}
+
+int validateMonthInput(int month) {
+    if (month < 1) {
+        printf("Month must be positive\n");
+        return 1;
+    }
+
+    if (month > 12) {
+        printf("Month must be 12 og less\n");
+        return 1;
+    }
+
+    return 0;
+}
+
+int validateDayInput(int day, int month) {
+    if (day < 1) {
+        printf("Day must be positive\n");
+        return 1;
+    }
+
+    if(month == 2 && day > 28){
+        printf("February can only have 28 days\n");
+        printf("Month: %d, Day: %d\n", month, day);
+        return 1;
+    }
+
+    if((month == 4  || month == 6 || month == 9 || month == 11) && day > 30){
+        printf("Day must be 30 or less in April, June, September and November\n");
+        return 1;
+    }
+
+    if(day > 31){
+        printf("Day must be 31 or less\n");
+        return 1;
+    }
+
     return 0;
 }
 
 int validateDateInput(unsigned int iDateInput){
     struct tm time = getTmFromYYYYMMDD(iDateInput);
 
-    //Ser om det er vits i å sjekke om datoen er gyldig
-    if(time.tm_year < 0
-            || time.tm_year > 9999
-            || time.tm_mon < 0
-            || time.tm_mon > 11
-            || time.tm_mday < 0
-            || time.tm_mday > 30){
-        printf("Invalid date input\n");
+    int iYear = time.tm_year + 1900;
+    int iMonth = time.tm_mon + 1;
+    int iDay = time.tm_mday;
+
+    if(validateYearInput(iYear) == 1){
         return 1;
     }
 
-    //Februar har 28 dager
-    if(time.tm_mon == 1) {
-        if (time.tm_mday > 27) {
-            printf("Invalid date input\n");
-            return 1;
+    if(validateMonthInput(iMonth) == 1){
+        return 1;
+    }
+
+    if(validateDayInput(iDay, iMonth) == 1){
+        return 1;
+    }
+
+    return 0;
+}
+
+int addDateMenu(int *iDateInput){
+    char szDate[9];
+    char szYear[5];
+    char szMonth[3];
+    char szDay[3];
+    int iValidInput = 0;
+
+    printf("Date of arrival\n");
+    printf("Enter a year (YYYY): ");
+    while(!iValidInput){
+        if(input(szYear, sizeof(szYear)) == 1){
+            printf("Year is too long. Enter a year (YYYY): ");
+        } else {
+            if(validateYearInput(atoi(szYear)) == 0){
+                iValidInput = 1;
+                szDate[0] = szYear[0];
+                szDate[1] = szYear[1];
+                szDate[2] = szYear[2];
+                szDate[3] = szYear[3];
+            }
         }
     }
 
-    //Januar, mars, mai, juli, august, oktober og desember har 31 dager
-    if(time.tm_mon == 0 || time.tm_mon == 2 || time.tm_mon == 4 || time.tm_mon == 6 || time.tm_mon == 7 || time.tm_mon == 9 || time.tm_mon == 11) {
-        if (time.tm_mday > 30) {
-            printf("Invalid date input\n");
-            return 1;
+    printf("Year: %s\n", szYear);
+    printf("Current date: %s\n", szDate);
+
+    iValidInput = 0;
+    printf("Enter a month (MM): \n");
+    printf("1. January\n");
+    printf("2. February\n");
+    printf("3. March\n");
+    printf("4. April\n");
+    printf("5. May\n");
+    printf("6. June\n");
+    printf("7. July\n");
+    printf("8. August\n");
+    printf("9. September\n");
+    printf("10. October\n");
+    printf("11. November\n");
+    printf("12. December\n");
+
+    while(!iValidInput){
+        if(input(szMonth, sizeof(szMonth)) == 1){
+            printf("Month is too long. Enter a month (MM): ");
+        } else if (validateMonthInput(atoi(szMonth)) == 0){
+            if(atoi(szMonth) < 10){
+                szDate[4] = '0';
+                szDate[5] = szMonth[0];
+            } else {
+                szDate[4] = szMonth[0];
+                szDate[5] = szMonth[1];
+            }
+            iValidInput = 1;
         }
     }
 
-    //April, juni, september og november har 30 dager
-    if(time.tm_mon == 3 || time.tm_mon == 5 || time.tm_mon == 8 || time.tm_mon == 10){
-        if(time.tm_mday > 29){
-            printf("Invalid date input\n");
-            return 1;
+    printf("Month: %s\n", szMonth);
+    printf("Current date: %s\n", szDate);
+
+    iValidInput = 0;
+    printf("Enter a day (DD): ");
+    while(!iValidInput){
+        if(input(szDay, sizeof(szDay)) == 1){
+            printf("Day is too long. Enter a day (DD): ");
+        } else {
+            if(validateDayInput(atoi(szDay), atoi(szMonth)) == 0){
+                if(atoi(szDay) < 10){
+                    szDate[6] = '0';
+                    szDate[7] = szDay[0];
+                } else {
+                    szDate[6] = szDay[0];
+                    szDate[7] = szDay[1];
+                }
+                iValidInput = 1;
+            } else {
+                printf("Invalid day input. Enter a day (DD): ");
+            }
         }
-    } else {
+    }
+
+    printf("Day: %s\n", szDay);
+    printf("Current date: %s\n", szDate);
+
+    if(validateDateInput(atoi(szDate)) == 0){
+        *iDateInput = atoi(szDate);
         return 0;
+    } else {
+        printf("Invalid date input. Please try again\n");
+        return 1;
     }
 }
 
 void addReservationMenu(struct reservation **ppHead, struct reservation **ppTail){
     char szName[128];
     char szRoomNr[3];
+    char szBuffer[8];
+
     unsigned int iDate;
     int iDays;
     float fPricePerDay;
+    int iValidInput = 0;
 
+    iValidInput = 0;
     printf("Enter name: ");
-    if(validateInput(scanf("%s", szName) != 1)){
-        return;
+    while(!iValidInput){
+        if(input(szName, sizeof(szName)) == 1){
+            printf("Name is too long. Enter name: ");
+        } else {
+            iValidInput = 1;
+        }
     }
 
+    iValidInput = 0;
     printf("Enter room number: ");
-    if(validateInput(scanf("%s", szRoomNr) != 1)){
-        return;
+    while (!iValidInput) {
+        if(input(szRoomNr, sizeof(szRoomNr)) == 1){
+            printf("Room number is too long. Enter room number: ");
+        } else {
+            iValidInput = 1;
+        }
     }
 
-    printf("Enter date (YYYYMMDD): ");
-    if(validateInput(scanf("%d", &iDate) != 1) || validateDateInput(iDate) == 1){
-        return;
-    }
+    while(addDateMenu(&iDate) != 0);
 
+    iValidInput = 0;
     printf("Enter number of days: ");
-    if(validateInput(scanf("%d", &iDays) != 1)){
-        return;
+    while (!iValidInput){
+        if(input(szBuffer, sizeof(szBuffer)) == 1){
+            printf("Number of days is too long. Enter number of days: ");
+        } else {
+            if(atoi(szBuffer) > 0){
+                iDays = atoi(szBuffer);
+                iValidInput = 1;
+            } else {
+                printf("Invalid number of days input. Enter number of days: ");
+            }
+        }
     }
 
+    iValidInput = 0;
     printf("Enter price per day: ");
-    if(validateInput(scanf("%f", &fPricePerDay) != 1)){
-        return;
+    while(!iValidInput){
+        if(input(szBuffer, sizeof(szBuffer)) == 1){
+            printf("Price per day is too long. Enter price per day: ");
+        } else {
+            if(atof(szBuffer) > 0){
+                fPricePerDay = atof(szBuffer);
+                iValidInput = 1;
+            } else {
+                printf("Invalid price per day input. Enter price per day: ");
+            }
+        }
     }
 
     if(*ppHead == NULL && *ppTail == NULL){
@@ -185,7 +330,7 @@ void searchByNameMenu(struct reservation **ppHead){
     char szName[128];
 
     printf("Enter name: ");
-    if(validateInput(scanf("%s", szName) != 1)){
+    if(input(szName, sizeof(szName)) == 1){
         return;
     }
 
@@ -193,13 +338,61 @@ void searchByNameMenu(struct reservation **ppHead){
 }
 
 void clearInputStack(){
-    int iStackEmpty = 0;
     char chRestOfLine;
+    int iStackEmpty = 0;
 
     while(iStackEmpty == 0){
         chRestOfLine = getchar();
         if(chRestOfLine == '\n' || chRestOfLine == EOF){
             iStackEmpty = 1;
         }
+    }
+}
+
+void handleNewLine(char *szInput, int iLength){
+    int iStackEmpty = 0;
+
+    int i = 0;
+    while(i < iLength){
+
+        if(szInput[i] == '\n'){
+            szInput[i] = '\0';
+            break;
+        }
+        i++;
+    }
+}
+
+int input(char *szInput, int iLength){
+
+    int c;
+
+    printf("Input before: %s\n", szInput);
+    printf("Length: %d\n", iLength);
+
+    char *input = fgets(szInput, iLength, stdin);
+
+    int i = 0;
+    int iInWhile = 1;
+
+    printf("Input: %s\n", szInput);
+    printf("Length: %lu\n", strlen(szInput));
+    while(iInWhile && i < iLength){
+
+        if(szInput[i] == '\n'){
+            szInput[i] = '\0';
+            iInWhile = 0;
+        }
+        i++;
+    }
+
+    while ((c = getchar()) != '\n' && c != EOF);
+
+    printf("\n");
+
+    if(input == NULL){
+        return 1;
+    } else {
+        return 0;
     }
 }

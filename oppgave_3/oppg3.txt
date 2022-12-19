@@ -1,0 +1,14 @@
+--- OPPGAVE 3 ---
+
+Du skal lage en dobbeltlenket liste, hvert element (struct) i listen skal inneholde pekere til både forrige element og neste element. Elementet skal også inneholde en tekststreng som inneholder NAVN, en tekststreng som inneholder ROMNUMMER, en integer for å representere DATO, en integer som inneholder ANTALL DØGN, og en float som inneholder PRIS PER DØGN. Totalt sett utgjør listen et reservasjonssystem for et hotell.
+Du skal lage funksjoner som utfører følgende operasjoner på listen:
+• Legge til et element i slutten av listen (reserver et rom)
+• Slette siste element i listen (en «angreknapp»)
+• Sletter alle elementer i listen som har DATO + ANTALL (dager) eldre enn dagens dato
+• Søker gjennom listen etter en reservasjon, gitt et NAVN på en gjest
+• Summerer sammen total verdi av bookingene for en gitt dag (sum av PRIS PER DØGN) for en dato som oppgis som parameter til funksjonen
+• Printer ut en reserverasjonsliste (i terminal vinduet) med alle reservasjoner for dagens dato, med navn, romnummer og antall døgn gjesten skal bli
+Du skal lage en main funksjon som mottar instrukser fra bruker basert på input fra tastaturet, main må altså kunne kalle alle de seks funksjonene over (for eksempel i en form for meny) og be brukeren om data som er nødvendig for å kalle de nevnte funksjoner. Main skal rydde opp alle data før den returnerer (et valg i menyen må være å avslutte).
+
+(3)
+

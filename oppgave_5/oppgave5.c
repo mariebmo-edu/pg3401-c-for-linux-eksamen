@@ -102,6 +102,7 @@ void* threadAFunction(void* pData) {
     }
 
     // Leser filen inn i bufferen i structen som er tilgjengelig for alle tråder (Sikres med mutex). Hvis filen er større enn bufferen, leses kun BUFFER_SIZE bytes om gangen.
+    // Hvis bytesRead er mindre enn BUFFER_SIZE, er filen ferdig lest.
     int bytesRead = 0;
     do {
         // Låser mutex for å sikre at kun en tråd kan skrive til bufferen om gangen.
@@ -133,7 +134,7 @@ void* threadBFunction(void* pData) {
     struct threadBData *pThreadBData = (struct threadBData*) pData;
 
     // Leser fra bufferen i structen som er tilgjengelig for alle tråder (Sikres med mutex) til filen er behandlet og bufferen er tom.
-    while (!pThreadBData->pThreadData->fileProcessed) {
+    while (!pThreadBData->pThreadData->fileProcessed || pThreadBData->pThreadData->iUsedBytes > 0) {
         // Låser mutex for å sikre at kun en tråd kan lese fra bufferen om gangen.
         pthread_mutex_lock(&pThreadBData->pThreadData->mutex);
 

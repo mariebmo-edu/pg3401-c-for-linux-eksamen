@@ -1,0 +1,26 @@
+--- OPPGAVE 2 ---
+
+Opprett en fil med følgende innhold:
+Dette er en test på oppgave 2, eksamen 2022. Teksten skal konverteres til hexadesimalt enkodede ascii tegn.
+Teksten skal lagres i en tekstfil bestående av 7 bit ASCII, og teksten skal være på 1 linje (se bort fra linjeskift du ser i denne oppgaveteksten).
+Skriv et program som leser denne filen, programmet skal så opprette en ny fil hvor hver bokstav/tegn skal skrives som ASCII representasjon av den hexadesimale verdien til bokstaven/tegnet i ASCII tabellen.
+Eksempel: Første bokstav i teksten er en stor D, i ASCII tabellen er dette hexadesimalt 0x44. I output filen skal du derfor skrive de to karakterene 4 og 4 for dette første «tegnet». (Med andre ord vil output filen være dobbelt så stor som input filen). De fem første bokstavene i input teksten vil altså resultere i følgende ti tegn i output filen: 4465747465.
+
+Både input filen og output filen skal være i samme katalog som programmet, og begge filene skal være en del av innlevert besvarelse.
+
+(2)
+
+I oppgave 2 skal vi gjøre om en fil fra tekst (char) til hex (%x).
+Siden teksten vi skal omgjøre inneholder norske bokstaver, vil det være noen feil i outputtet, da ASCII er basert på det engelske alfabetet. Dette vil si at man ikke kan konvertere output-fila tilbake til char,
+da teksten vil bli feil. Dette er ikke et problem, da vi ikke skal gjøre om tilbake til char i denne oppgaven.
+
+Oppgaven er sjekket med Valgrind, med følgende output:
+
+==2456==
+==2456== HEAP SUMMARY:
+==2456==     in use at exit: 0 bytes in 0 blocks
+==2456==   total heap usage: 5 allocs, 5 frees, 10,160 bytes allocated
+==2456==
+==2456== All heap blocks were freed -- no leaks are possible
+==2456==
+==2456== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

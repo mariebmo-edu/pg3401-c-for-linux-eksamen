@@ -7,6 +7,7 @@
 #include <time.h>
 #include "include/menu.h"
 #include "include/reservation.h"
+#include "include/dateTimeHandling.h"
 
 // Head <-- next / prev --> Tail
 
@@ -188,14 +189,11 @@ void printReservations(struct reservation **ppHead){
 
     struct reservation *pCurr = *ppHead;
 
-    printf("HEAD\n");
-
     while(pCurr != NULL){
         printReservation(&pCurr);
         printSeparator(50, '-');
         pCurr = pCurr->pPrev;
     }
-    printf("TAIL\n");
 }
 
 void printReservation(struct reservation **ppReservation){
@@ -206,25 +204,9 @@ void printReservation(struct reservation **ppReservation){
     printf("Name: %s\n", pCurr->szName);
     printf("Room number: %s\n", pCurr->szRoomNr);
     printf("Date: ");
-    printDate(&date);
+    printDateFormatted(&date);
+    printf("\n");
     printf("Days: %d\n", pCurr->iDays);
     printf("Price per day: %f\n", pCurr->fPricePerDay);
-}
-
-struct tm getTmFromYYYYMMDD(unsigned int iDate){
-    struct tm date;
-    memset(&date, 0, sizeof(struct tm));
-
-    date.tm_year = iDate / 10000 - 1900;
-    date.tm_mon = iDate % 10000 / 100 - 1;
-    date.tm_mday = iDate % 100;
-
-    return date;
-}
-
-void printDate(struct tm *pTmDate){
-
-    char szFormattedDate[20];
-    printf("%s\n", szFormattedDate);
 }
 
