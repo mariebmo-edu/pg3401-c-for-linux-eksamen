@@ -1,11 +1,14 @@
 //
-// Created by marie on 09.12.2022.
+// Created by 1012
 //
-
 #include <stdio.h>
 #include <string.h>
-
 #include "include/menu.h"
+
+// Metode som printer en sentrert header basert på lengde og decorator. Eks:
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                1. Add reservation
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void printHeader(char szHeader[], int length, char decorator){
 
@@ -26,6 +29,7 @@ void printHeader(char szHeader[], int length, char decorator){
     printf("%s\n", decoratorLine);
 }
 
+// Metode som printer menyen. Bruker printHeader for å printe headeren.
 void printMenu(int length, char decorator){
     printHeader("Menu", length, decorator);
     printf("1. Add reservation\n");
@@ -38,6 +42,8 @@ void printMenu(int length, char decorator){
     printf("Enter choice: ");
 }
 
+// Metode som printer en separator basert på lengde og decorator. Eks:
+// --------------------------------------------------
 void printSeparator(int length, char decorator){
     char decoratorLine[length+1];
     memset(decoratorLine, decorator, length);

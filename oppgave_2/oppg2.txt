@@ -16,7 +16,6 @@ da teksten vil bli feil. Dette er ikke et problem, da vi ikke skal gjøre om til
 
 Oppgaven er sjekket med Valgrind, med følgende output:
 
-==2456==
 ==2456== HEAP SUMMARY:
 ==2456==     in use at exit: 0 bytes in 0 blocks
 ==2456==   total heap usage: 5 allocs, 5 frees, 10,160 bytes allocated

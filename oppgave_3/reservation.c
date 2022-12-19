@@ -1,5 +1,5 @@
 //
-// Created by marie on 09.12.2022.
+// Created by 1012
 //
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,10 +11,11 @@
 
 // Head <-- next / prev --> Tail
 
+// Går gjennom listen og deallokerer minnet til alle reservasjonene. "sletter" alt.
 void clearAllocation(struct reservation **ppHead, struct reservation **ppTail){
     struct reservation *pTemp = *ppHead;
     while(pTemp != NULL){
-        *ppHead = pTemp->pNext;
+        *ppHead = pTemp->pPrev;
         free(pTemp);
         pTemp = *ppHead;
     }
@@ -22,6 +23,7 @@ void clearAllocation(struct reservation **ppHead, struct reservation **ppTail){
     *ppTail = NULL;
 }
 
+// Hvis det ikke er noen reservasjoner, bruker den init-reservasjon for å sette opp listen.
 int initReservation(struct reservation **ppHead, struct reservation **ppTail, char *pszName, char *pszRoomNr, int iDate, int iDays, float fPricePerDay){
 
     struct reservation *pNew = malloc(sizeof(struct reservation));
@@ -45,9 +47,8 @@ int initReservation(struct reservation **ppHead, struct reservation **ppTail, ch
     return 1;
 } // End initReservation
 
+// Legger til en ny reservasjon i listen foran ppBeforeRes-reservasjonen.
 int insertBefore(struct reservation **ppBeforeRes, char *pszName, char *pszRoomNr, int iDate, int iDays, float fPricePerDay){
-
-
 
     struct reservation *pNew = malloc(sizeof(struct reservation));
 
@@ -75,6 +76,7 @@ int insertBefore(struct reservation **ppBeforeRes, char *pszName, char *pszRoomN
     return 1;
 } // End insertBefore
 
+// Legger til en ny reservasjon i listen etter ppAfterRes-reservasjonen.
 int insertAfter(struct reservation **ppAfterRes, char *pszName, char *pszRoomNr, int iDate, int iDays, float fPricePerDay){
 
     struct reservation *pNew = malloc(sizeof(struct reservation));
@@ -103,6 +105,7 @@ int insertAfter(struct reservation **ppAfterRes, char *pszName, char *pszRoomNr,
     return 1;
 } // End insertAfter
 
+// Fjerner en reservasjon fra listen og deallokerer minnet.
 void deleteReservation(struct reservation **ppReservation){
 
     struct reservation *pTemp = *ppReservation;
@@ -126,32 +129,41 @@ void deleteReservation(struct reservation **ppReservation){
     free(pTemp);
 } // End deleteReservation
 
+// Går gjennom alle reservasjoner og fjerner de der dato + dager er mindre enn dagens dato. "fullførte" opphold.
 void deleteCompletedReservations(struct reservation **ppHead){
 
     struct reservation *pTemp = *ppHead;
+
+    // Dagens dato som en time_t struct.
     time_t dateToday = time(NULL);
 
 
     while(pTemp != NULL){
 
-            struct tm date = getTmFromYYYYMMDD(pTemp->iDate);
+        // Lager en ny struct tm med dato fra reservasjonen.
+        struct tm date = getTmFromYYYYMMDD(pTemp->iDate);
 
-            date.tm_mday += pTemp->iDays;
+        // Legger til antall dager fra reservasjonen.
+        date.tm_mday += pTemp->iDays;
 
-            time_t dateReservationFinished = mktime(&date);
+        // Lager en ny time_t med dato fra struct tm.
+        time_t dateReservationFinished = mktime(&date);
 
-            if(dateReservationFinished < dateToday){
 
-                struct reservation *pPrev = pTemp->pPrev;
-                deleteReservation(&pTemp);
+        // Hvis dato fra reservasjonen er mindre enn dagens dato, sletter den reservasjonen.
+        if(dateReservationFinished < dateToday){
 
-                pTemp = pPrev;
-            } else {
-                pTemp = pTemp->pPrev;
-            }
+            struct reservation *pPrev = pTemp->pPrev;
+            deleteReservation(&pTemp);
+
+            pTemp = pPrev;
+        } else {
+            pTemp = pTemp->pPrev;
         }
+    }
 }
 
+// Går gjennom listen og finner reservasjonene med navn lik input-navn (pName).
 void searchReservationByName(struct reservation **ppHead, char *pName){
 
     struct reservation *pTemp = *ppHead;
@@ -159,6 +171,8 @@ void searchReservationByName(struct reservation **ppHead, char *pName){
 
     while(pTemp != NULL){
         if(strcmp(pTemp->szName, pName) == 0){
+
+            //Hvis den finner minst en, printer den ut en separator.
             if(iFoundAtLeastOne == 1){
                 printSeparator(50, '-');
             }
@@ -173,6 +187,7 @@ void searchReservationByName(struct reservation **ppHead, char *pName){
     }
 } // End searchReservationByName
 
+// Går gjennom listen og legger sammen dager*pris for alle reservasjoner.
 void sumPriceOfReservations(struct reservation **ppHead){
 
     struct reservation *pTemp = *ppHead;
@@ -185,6 +200,7 @@ void sumPriceOfReservations(struct reservation **ppHead){
     printf("Sum of all reservations: %f\n", fSum);
 }
 
+// Går gjennom listen og printer ut alle reservasjoner.
 void printReservations(struct reservation **ppHead){
 
     struct reservation *pCurr = *ppHead;
@@ -196,6 +212,7 @@ void printReservations(struct reservation **ppHead){
     }
 }
 
+// Printer ut en reservasjon.
 void printReservation(struct reservation **ppReservation){
 
     struct reservation *pCurr = *ppReservation;

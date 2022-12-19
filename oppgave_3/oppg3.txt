@@ -12,3 +12,22 @@ Du skal lage en main funksjon som mottar instrukser fra bruker basert på input 
 
 (3)
 
+Etter jeg gjorde om fra scanf til fgets, så må brukeren av og til trykke enter to ganger.
+Det virker som problemet skjer hvis brukeren skriver inn en streng som er kortere eller lengre
+enn det som er definert i char arrayen. Jeg har prøvd å løse dette ved å bruke en while-løkke som
+gjør \n om til \0 for å vise at strengen er ferdig, samt fjerne overflødige chars med "getchar()", men problemet fortsetter.
+Jeg har valgt å beholde fgets, da det gjør det tryggere å lese inn data fra brukeren ved å hindre buffer overflow.
+
+Oppgaven er sjekket med Valgrind med følgende output ved testing av alle funksjonene:
+
+==17672== HEAP SUMMARY:
+==17672==     in use at exit: 0 bytes in 0 blocks
+==17672==   total heap usage: 29 allocs, 29 frees, 10,235 bytes allocated
+==17672==
+==17672== All heap blocks were freed -- no leaks are possible
+==17672==
+==17672== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+
+Den ene feilen er en "Conditional jump or move depends on uninitialised value(s)" som kommer fra "Conditional jump or move depends on uninitialised value(s)" i addDateMenu.
+Jeg har prøvd forskjellige måter å finne og løse feilen, men jeg har ikke klart å finne ut av hva som er galt.
+Siden applikasjonen fungerer som den skal, og det ikke er noen minnefeil, så har jeg valgt å gå videre.

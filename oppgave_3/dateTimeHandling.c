@@ -1,5 +1,5 @@
 //
-// Created by marie on 19.12.2022.
+// Created by 1012
 //
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,4 +34,18 @@ void printDateFormatted(struct tm *pTmDate){
     char buffer[80];
     strftime(buffer, 80, "%d. %B %Y", pTmDate);
     printf("%s", buffer);
+}
+
+// Tar inn et årstall og returnerer 1 hvis det er et skuddår, 0 hvis ikke.
+int isLeapYear(int year){
+    if(year % 4 == 0){
+        if(year % 100 == 0){
+            if(year % 400 == 0){
+                return 1;
+            }
+            return 0;
+        }
+        return 1;
+    }
+    return 0;
 }

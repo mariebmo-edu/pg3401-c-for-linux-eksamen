@@ -1,7 +1,6 @@
 //
-// Created by 1012 on 09.12.2022.
+// Created by 1012
 //
-
 #ifndef __RESERVATION_H__
 #define __RESERVATION_H__
 
