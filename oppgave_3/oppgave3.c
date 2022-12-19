@@ -346,9 +346,19 @@ int input(char *szInput, int iLength){
         i++;
     }
 
-    while ((c = getchar()) != '\n' && c != EOF && c != '\0');
+    i = strlen(szInput);
+    iInWhile = 1;
+    while(iInWhile) {
+        c = getchar();
+        i++;
+        if (c == '\n' || c == EOF) {
+            iInWhile = 0;
+        }
+    }
 
     if(input == NULL){
+        return 1;
+    } else if (i > iLength){
         return 1;
     } else {
         return 0;
