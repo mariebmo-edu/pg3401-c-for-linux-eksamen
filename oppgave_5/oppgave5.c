@@ -1,3 +1,6 @@
+//
+// Created by 1012
+//
 #include <pthread.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -124,7 +127,6 @@ void* threadAFunction(void* pData) {
 
     // Setter filen til å være "ferdig behandlet". Dette gjør at tråd B vet at den ikke trenger å vente på mer data når bufferen er tom.
     pThreadAData->pThreadData->fileProcessed = true;
-
     pthread_exit(NULL);
 }
 

@@ -1,7 +1,6 @@
 //
-// Created by marie on 12.12.2022.
+// Created by 1012
 //
-
 #ifndef __OPPGAVE6_CLIENT_H__
 #define __OPPGAVE6_CLIENT_H__
 

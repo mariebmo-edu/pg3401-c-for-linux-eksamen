@@ -1,0 +1,34 @@
+--- OPPGAVE 6 ---
+Du skal i denne oppgaven lage (en del av) en enkelt nettleser (browser) og en web server. Browser og server skal støtte HTTP GET for å kunne laste ned en fil. Disse to applikasjonene skal leveres inn i hver sin mappe, med hver sin makefile; oppgave6_srv og oppgave6_klient.
+Oppgaven skal ikke løses ved bruk av Curl eller andre tredjepartsbiblioteker, og skal ikke basere seg på wget eller tilsvarende fra operativsystemet – kun bruk av Sockets slik vi har lært på forelesning 11 om Nettverk vil gi poeng på oppgaven.
+For ordens skyld nevnes spesifikt at det ikke vil trekkes i poeng for å gjenbruke kode fra løsningsforslag som ble presentert på siste forelesning når dere lager klienten, kommenter i så fall hvilke endringer dere har gjort i koden for å fungere til denne oppgaveteksten. (De fleste poeng i denne oppgaven tilligger server applikasjonen.)
+Web serveren skal BINDE (lytte) til en port du velger, det anbefales for denne oppgaven å kun lytte på adresse 127.0.0.1 for å ikke eksponere porten utenfor egen maskin. Web serveren skal akseptere HTTP GET requester over TCP som følger HTTP spesifikasjonen. Serveren skal anse gjeldende mappe som «root» og åpne filer relativ til gjeldende mappe. Filen klienten ber om som «URL» skal sendes tilbake til klienten som en del av serverens HTTP GET reply i henhold til HTTP spesifikasjonen. Serveren skal så lukke forbindelsen til klienten, og vente på en ny klient som kobler seg til.
+Browseren (klienten) skal startes med et filnavn som parameter og skal CONNECTE til 127.0.0.1 på porten du har valgt, og sende en HTTP GET request hvor filen (som ble oppgitt som parameter) skal lastes ned fra server applikasjonen. Klient applikasjonen skal lese HTTP response den får tilbake fra server, lagre denne filen i sin mappe, for så å avslutte.
+Applikasjonene kan for eksempel testes ved at klienten laster ned kildekoden til serveren, ved for eksempel «oppgave6_klient include/httpfunc.h».
+Da kun opplasting av filer skal støttes kan det tas en del snarveier, deriblant kan HTTP headere stort sett hardkodes med faste verdier. Studenten kan velge å kun støtte filer med tekst (ikke binære filer), men det vel naturligvis telle positivt hvis studenten klarer å også støtte binære filer (for eksempel bilder).
+
+(6)
+
+Client
+
+Oppgaven er sjekket med Valgrind med følgende output:
+
+==32333== HEAP SUMMARY:
+==32333==     in use at exit: 0 bytes in 0 blocks
+==32333==   total heap usage: 3 allocs, 3 frees, 5,592 bytes allocated
+==32333==
+==32333== All heap blocks were freed -- no leaks are possible
+==32333==
+==32333== ERROR SUMMARY: 19 errors from 7 contexts (suppressed: 0 from 0)
+
+Server
+
+Oppgaven er sjekket med Valgrind med følgende output:
+
+==32334== HEAP SUMMARY:
+==32334==     in use at exit: 0 bytes in 0 blocks
+==32334==   total heap usage: 1 allocs, 1 frees, 1,024 bytes allocated
+==32334==
+==32334== All heap blocks were freed -- no leaks are possible
+==32334==
+==32334== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

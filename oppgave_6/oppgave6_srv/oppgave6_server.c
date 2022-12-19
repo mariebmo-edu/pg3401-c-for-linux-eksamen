@@ -1,7 +1,6 @@
 //
-// Created by marie on 12.12.2022.
+// Created by 1012
 //
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,60 +30,70 @@ int main(int argc, char *argv[]) {
     char szFileName[128];
     char szResponseHeader[256];
 
+    // Lager en server-socket
     int sockServerFd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockServerFd < 0) {
-        perror("ERROR opening socket\n");
+        printf("ERROR opening socket\n");
         exit(1);
     }
 
+    // Allokerer minne til en sockaddr_in struktur, og setter verdier.
     struct sockaddr_in saServerAddr = {0};
     saServerAddr.sin_family = AF_INET;
     saServerAddr.sin_port = htons(PORT);
     saServerAddr.sin_addr.s_addr = inet_addr(ADDRESS);
 
+    // Binder socketen til adressen
     if (bind(sockServerFd, (struct sockaddr *) &saServerAddr, sizeof(saServerAddr)) < 0) {
-        perror("ERROR binding to socket\n");
+        printf("ERROR binding to socket\n");
         close(sockServerFd);
         exit(1);
     }
 
+    // Lytter på socketen
     if(listen(sockServerFd, 5) < 0) {
-        perror("ERROR listening to socket\n");
+        printf("ERROR listening to socket\n");
         close(sockServerFd);
         exit(1);
     }
 
+    // Så lenge serveren kjører og lytter på socketen, så skal den akseptere nye klient-connections
     while(1) {
+        // Aksepterer en klient-connection
         int clientFd = accept(sockServerFd, (struct sockaddr *) NULL, NULL);
 
         if (clientFd < 0) {
-            perror("ERROR accepting connection\n");
+            printf("ERROR accepting connection\n");
             continue;
         }
 
         printf("Connection accepted\n");
 
+        // Leser fra klienten
         if(!fork()) {
             printf("Child process created\n");
             close(sockServerFd);
             memset(szBuffer, 0, BUFFER_SIZE);
 
+            // Leser fra klienten
             if(read(clientFd, szBuffer, BUFFER_SIZE) < 0) {
-                perror("ERROR reading from socket\n");
+                printf("ERROR reading from socket\n");
                 close(clientFd);
                 exit(1);
             }
 
+            // Henter ut filnavnet fra bufferen
             sscanf(szBuffer, "GET /%s HTTP/1.1", szFileName);
 
             printf("Requested file: %s\n", szFileName);
 
             printf("%s", szBuffer);
 
+            // Hvis serveren ikke finner fila, så returnerer vi "webpage", som er en html-side. Hvis serveren finner fila, så returnerer vi filen.
             if(access(szFileName, F_OK) < 0){
                 printf("File not found\n");
                 if(write(clientFd, webpage, sizeof(webpage) - 1) < 0) {
-                    perror("ERROR writing to socket\n");
+                    printf("ERROR writing to socket\n");
                     close(clientFd);
                     exit(1);
                 }
@@ -96,14 +105,12 @@ int main(int argc, char *argv[]) {
 
                 sprintf(szResponseHeader, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n", stFileInfo.st_size);
                 if(write(clientFd, szResponseHeader, strlen(szResponseHeader)) < 0) {
-                    perror("ERROR sending header to client\n");
+                    printf("ERROR sending header to client\n");
                     close(clientFd);
                     exit(1);
                 }
                 sendfile(clientFd, fd, NULL, stFileInfo.st_size);
             }
-
-
 
             close(clientFd);
             printf("Client -  Connection closed\n");

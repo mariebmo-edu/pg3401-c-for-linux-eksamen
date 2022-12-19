@@ -1,0 +1,22 @@
+--- OPPGAVE 5 ---
+I praktisk programmering er det ofte effektivt å legge tidkrevende operasjoner ut i arbeidstråder, eksempler på dette er filoperasjoner, nettverksoperasjoner og kommunikasjon med eksterne enheter. I denne oppgaven skal du simulere slike operasjoner med et mindre datasett.
+Du skal lage en applikasjon som består av 3 tråder, hovedtråden (som startet main) og 2 arbeidstråder. Når hovedtråden starter skal den starte arbeidstrådene med mekanismer for tråd-kommunikasjon og synkronisering (i denne oppgaven har ikke hovedtråden noen annen funksjon, og skal kun starte de to trådene som skal gjøre selve jobben). Trådene skal ha et minneområde med plass til 4096 byte. (Det kan være en struct som også inneholder andre kontrolldata som for eksempel antall byte i bufferet og annet studenten finner nyttig.)
+Den ene arbeidstråden (tråd A) skal lese PDF filen som er oppgaveteksten til denne eksamen, arbeidstråd A skal så sende filen over til den andre arbeidstråden (tråd B) (gjennom flere sykluser ved hjelp av minneområdet beskrevet over, og signalere tråd B om at det er data tilgjengelig i bufferet). Tråd B skal så telle opp antall forekomster av bytes med verdi 00, 01, 02, og så videre til; FF i filen den får sendt over. Tråd A og tråd B skal gå i loop for å prosessere PDF filen helt til den er ferdig. Når filen er sendt over i sin helhet skal arbeidstråd A avslutte. Arbeidstråd B skal fullføre sin opptelling av bytes, og så skrive ut til terminal vinduet antall forekomster av hver av de 256 mulige byte-verdiene, før den også avslutter. Hovedtråden (main) skal vente på at begge trådene avslutter, rydde opp korrekt og så avslutte applikasjonen.
+
+(5)
+
+Da en PDF inneholder en del ekstra data, som gjør at det er vanskelig å være helt sikker på om output er riktig, testet jeg programmet også på en tekstfil.
+Tektfilen ble lest korrekt, med riktig antall byte-count. Jeg må dermed ta utgangspunkt i at PDF-filen også blir lest korrekt.
+
+Oppgaven er sjekket med Valgrind med følgende output:
+
+==31184== LEAK SUMMARY:
+==31184==    definitely lost: 0 bytes in 0 blocks
+==31184==    indirectly lost: 0 bytes in 0 blocks
+==31184==      possibly lost: 0 bytes in 0 blocks
+==31184==    still reachable: 1,654 bytes in 4 blocks
+==31184==         suppressed: 0 bytes in 0 blocks
+==31184==
+==31184== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+Jeg prøvde å finne ut av "still reachable", men ut i fra det jeg fant på nettet, er dette en vanlig og ufarlig ting å få når man har pthreads som joines inn, i steden for å bruke pthread_destroy. Jeg har derfor ikke gjort noe med dette.
