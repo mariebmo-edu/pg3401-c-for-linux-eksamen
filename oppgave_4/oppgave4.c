@@ -1,5 +1,5 @@
 //
-// Created by marie on 09.12.2022.
+// Created by 1012
 //
 #include <string.h>
 #include <stdlib.h>
@@ -64,7 +64,7 @@ MYHTTP *ProcessHttpHeader(char *pszHttp) {
         }
 
         strchr(pszPtr, '\n')[0] = 0;
-        strcpy(pHttp->szServer, pszPtr);
+        strncpy(pHttp->szServer, pszPtr, sizeof(pHttp->szServer) - 1); // Skal være strncpy, ikke strcpy.
         pszPtr[strlen(pHttp->szServer)] = '\n';
     }
 
@@ -77,7 +77,7 @@ MYHTTP *ProcessHttpHeader(char *pszHttp) {
         }
 
         strchr(pszPtr, '\n')[0] = 0;
-        strncpy(pHttp->szContentType, pszPtr, 15); // Skal være strncpy, ikke strcpy.
+        strncpy(pHttp->szContentType, pszPtr, sizeof(pHttp->szContentType) - 1); // Skal være strncpy, ikke strcpy.
         pszPtr[strlen(pHttp->szContentType)] = '\n';
     }
 

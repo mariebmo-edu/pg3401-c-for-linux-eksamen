@@ -1,0 +1,60 @@
+--- OPPGAVE 4 ---
+
+Du har fått beskjed om å utføre feilretting av den følgende funksjonen, du får beskjed om at Content-Length ikke blir satt riktig i den returnerte structen. (Funksjonen kalles med en tekstbuffer som inneholder HTTP REPLY fra en webserver, og structen blir frigitt av funksjonen som kaller funksjonen.)
+Det viser seg at koden faktisk inneholder 3 feil. Du skal rette alle feilene, i besvarelsen skal du ha den feilrettede funksjonen, og en main metode som tester funksjonen (der hvor det er mulig bør main kalle funksjonen på en slik måte at den fremprovoserer feilene som var i den opprinnelige koden. I tekstbesvarelsen skal du kort forklare hvilke feil du fant, hvorfor dette er feil og forklare hvordan du løste dem.
+Det er også ønsket at en ny verdi legges til i structen som sier hvilken http versjon som er benyttet (typisk HTTP/1.0, HTTP/1.1 eller HTTP/2.0), angitt som en float verdi, du skal skrive denne koden og legge den til i funksjonen.
+
+typedef struct _MYHTTP { int iHttpCode; int iContentLength;
+bool bIsSuccess; char szServer[16]; char szContentType[16]; } MYHTTP, *PMYHTTP;
+MYHTTP* ProcessHttpHeader(char *pszHttp) {
+char* pszPtr;
+MYHTTP* pHttp = (MYHTTP*)malloc(sizeof(PMYHTTP));
+if (!pHttp) return NULL;
+memset(pHttp, 0, sizeof(MYHTTP));
+pHttp->iHttpCode = atoi(pszHttp + strlen("HTTP/1.x "));
+if (pHttp->iHttpCode == 200) {
+pHttp->bIsSuccess = true;
+}
+pszPtr = strstr(pszHttp, "Server");
+if (pszPtr) {
+pszPtr += 6; while (!isalpha(pszPtr[0]))pszPtr++;
+strchr(pszPtr, '\n')[0] = 0;
+strncpy(pHttp->szServer, pszPtr, 15);
+pszPtr[strlen(pHttp->szServer)] = '\n';
+}
+pszPtr = strstr(pszHttp, "Content-Type");
+if (pszPtr) {
+pszPtr += 12; while (!isalpha(pszPtr[0]))pszPtr++;
+strchr(pszPtr, '\n')[0] = 0;
+strcpy(pHttp->szContentType, pszPtr);
+pszPtr[strlen(pHttp->szContentType)] = '\n';
+}
+pszPtr = strstr(pszHttp, "Content-Length");
+if (pszPtr) {
+pszPtr += 14; while (!isdigit(pszPtr[0])) pszPtr++;
+pHttp->iContentLength = '0' + atoi(pszPtr);
+}
+return pHttp;
+}
+
+(4)
+
+Foruten generell håndtering av retur-verdier og dårlig kode, er dette noen av punktene som måtte fikses for å få et kjørende program:
+
+(a) Servernavnet (og forsåvidt content-type) kan være lengre enn 16 tegn. For å løse dette har jeg oppjustert til 32, men det kan hende man trenger mer.
+
+(b) MYHTTP* pHttp må allokeres med sizeof(MYHTTP) og ikke sizeof(PMYHTTP), da PMYHTTP er en peker, og vil altså være 8 byte, når structen bruker en del mer plass.
+
+(c) Endret til å benytte strncpy i stedet for strcpy, da strcpy ikke sjekker at det er plass til å kopiere innholdet. strncpy vil kopiere maks 15 tegn, og legge til null-terminator.
+
+(d) pHttp-iContentLength = '0' + atoi(pszPtr); skal være pHttp->iContentLength = atoi(pszPtr); da det er en peker til en int-verdi, og ikke en char-verdi.
+
+Ved å benytte koden i oppgave4.c, så kjører programmet uten noe problem, og valgrind rapporterer ingen minnelekkasjer.
+
+==29192== HEAP SUMMARY:
+==29192==     in use at exit: 0 bytes in 0 blocks
+==29192==   total heap usage: 2 allocs, 2 frees, 1,084 bytes allocated
+==29192==
+==29192== All heap blocks were freed -- no leaks are possible
+==29192==
+==29192== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
