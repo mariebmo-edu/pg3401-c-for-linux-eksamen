@@ -1,8 +1,10 @@
 //
-// Created by marie on 14.12.2022.
+// Created by 1012
 //
+#ifndef __OPPGAVE7_H__
+#define __OPPGAVE7_H__
 
-#ifndef PG3401_H22_1012_OPPGAVE7_H
-#define PG3401_H22_1012_OPPGAVE7_H
+void createBeautifiedFileName(char *fileName, char *newFileName);
+void addIndentation(FILE *fileOut, int iIndentation);
 
-#endif //PG3401_H22_1012_OPPGAVE7_H
+#endif //__OPPGAVE7_H__

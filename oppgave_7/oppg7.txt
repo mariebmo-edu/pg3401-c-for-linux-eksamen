@@ -1,0 +1,29 @@
+--- OPPGAVE 7 ---
+
+Du skal lage en applikasjon som fungerer som en «kode beautifier», en applikasjon som endrer kildekode til noe som passer forfatterens kodestil (gjør koden «penere»).
+Applikasjonen skal ta et filnavn til en C-source fil som parameter når den startes fra terminal. Applikasjonen skal lese denne filen og gjøre to endringer i filen før den lagrer filen med samme navn, men lagt til _beautified før .c i filnavnet.
+Først skal applikasjonen ta alle forekomster av for-looper og erstatte disse med while-looper, det betyr at kode som dette:
+for (a = 0; a < b; a++) {…}
+skal erstattes med en while loop og vil se noe slik ut:
+a = 0;
+while (a < b) {… a++; }
+Hvor … angir resten av koden i løkken, og naturligvis må beholdes slik den er.
+I tillegg skal alle forekomster av tab (ASCII kode 0x09) erstattes med 3 spacer (mellomrom, ASCII kode 0x20).
+
+(7)
+
+Jeg valgte å gå all-in med regex, da hoveddelen av oppgaven er å finne et mønster, og endre det.
+Jeg brukte regex for å finne forløkker, og regex for å finne tab, og '}'-chars.
+Koden fungerer også med nestede forløkker.
+
+Det kan være bruksområder jeg ikke har tenkt over, men jeg har testet den på en del forskjellige filer, og den fungerer som den skal.
+
+Oppgaven er sjekket med Valgrind med følgende output:
+
+==2677== HEAP SUMMARY:
+==2677==     in use at exit: 0 bytes in 0 blocks
+==2677==   total heap usage: 1 allocs, 1 frees, 1,024 bytes allocated
+==2677==
+==2677== All heap blocks were freed -- no leaks are possible
+==2677==
+==2677== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

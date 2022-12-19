@@ -1,5 +1,5 @@
 //
-// Created by marie on 14.12.2022.
+// Created by 1012
 //
 #include <regex.h>
 #include <stdio.h>
@@ -9,11 +9,9 @@
 
 #define LINE_LENGTH 1024
 
-void createBeautifiedFileName(char *fileName, char *newFileName);
-void addIndentation(FILE *fileOut, int iIndentation);
-
 int main(int argc, char *argv[]) {
 
+    // Sjekker om det er gitt et filnavn som argument
     if (argc != 2) {
         printf("Usage: %s <filename>\n", argv[0]);
         return 1;
@@ -27,7 +25,7 @@ int main(int argc, char *argv[]) {
     strcpy(fileName, argv[1]);
     createBeautifiedFileName(fileName, newFileName);
 
-    //Regex matching lines with for loops, groups:
+    //Regex matcher linjer med for-løkker
     // 0: whole line,
     // 1: characters before "for("
     // 2: initialisation statement (int i = 0)
@@ -40,25 +38,31 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    //Regex matching lines with tabs
+    //Regex matcher linjer med tab
     iRegexResult = regcomp(&regexForTab, "\\t", REG_EXTENDED);
     if (iRegexResult) {
         printf("Could not compile tab regex");
         return 1;
     }
 
-    //Regex matching lines with }
+    //Regex matcher linjer med }
     iRegexResult = regcomp(&regexForCurlyBraceEnd, "\\s*\\}\\s*", REG_EXTENDED);
     if (iRegexResult) {
         printf("Could not compile curly braces regex");
         return 1;
     }
 
+    //Åpner filen som skal leses, og filen som skal skrives til
     FILE *fileIn = fopen(fileName, "r");
     FILE *fileOut = fopen(newFileName, "w+");
 
     if (fileIn == NULL) {
         printf("Could not open file %s\n", fileName);
+        return 1;
+    }
+
+    if (fileOut == NULL) {
+        printf("Could not open file %s\n", newFileName);
         return 1;
     }
 
