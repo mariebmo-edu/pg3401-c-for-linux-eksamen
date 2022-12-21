@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     // 4: increment statement (i++)
     // 5: characters after "){"
     // 6: characters after "} "
-    iRegexResult = regcomp(&regexForLoop, "(.*)for\\s*\\(\\s*([^;]+);\\s*([^;]+);\\s*([^\\)]+)\\)\\s*\\{\\s*([^}]*)\\}\\s*(.*)", REG_EXTENDED);
+    iRegexResult = regcomp(&regexForLoop, "(.*)for\\s*\\(\\s*([^;]+);\\s*([^;]+);\\s*([^\\)]+)\\)\\s*\\{\\s*([^}]*)\\}*\\s*(.*)", REG_EXTENDED);
     if (iRegexResult) {
         printf("Could not compile forloop regex");
         return 1;
@@ -239,7 +239,6 @@ void forLoopToWhileLoop(char *buffer, regmatch_t *regMatches, FILE *fileOut, int
         if(strlen(afterLoop) > 0 && afterLoop[0] != '\r' && afterLoop[0] != '\n') {
             addIndentation(fileOut, *iIndentation);
             fputs(afterLoop, fileOut);
-            fputc('\n', fileOut);
 
         }
 
