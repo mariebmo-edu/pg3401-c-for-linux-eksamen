@@ -6,5 +6,7 @@
 
 void createBeautifiedFileName(char *fileName, char *newFileName);
 void addIndentation(FILE *fileOut, int iIndentation);
+void forLoopToWhileLoop(char *line, regmatch_t *regMatches, FILE *fileOut, int *iIsInCurrentMatch, int *iIndentation, char *updateCondition, regex_t *regexForCurlyBraceEnd);
+void handleCodeBeforeLoop(char *beforeLoop, FILE *fileOut, int *iIndentation);
 
 #endif //__OPPGAVE7_H__

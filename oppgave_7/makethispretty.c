@@ -28,5 +28,13 @@ int main(int argc, char *argv[]) {
         printf("And multiple prints");
     }
 
+    for(int pointer->int = 0; pointer->int < 10; pointer->int++){
+        printf("And pointer arguments?");
+    }
+
+    for(int j = 0; j < 10; j++){ printf("and one liners?"); }
+
+    printf("before forloop"); for(int i = 0; i < 10; i++){ printf("hello"); }
+
     return 0;
 }
