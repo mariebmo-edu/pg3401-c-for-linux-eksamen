@@ -22,10 +22,10 @@ Det kan være bruksområder jeg ikke har tenkt over, men jeg har testet den på 
 
 Oppgaven er sjekket med Valgrind med følgende output:
 
-==2677== HEAP SUMMARY:
-==2677==     in use at exit: 0 bytes in 0 blocks
-==2677==   total heap usage: 1 allocs, 1 frees, 1,024 bytes allocated
-==2677==
-==2677== All heap blocks were freed -- no leaks are possible
-==2677==
-==2677== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==5134== HEAP SUMMARY:
+==5134==     in use at exit: 0 bytes in 0 blocks
+==5134==   total heap usage: 1,688 allocs, 1,688 frees, 177,836 bytes allocated
+==5134==
+==5134== All heap blocks were freed -- no leaks are possible
+==5134==
+==5134== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
