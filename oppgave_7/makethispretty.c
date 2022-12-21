@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 
     for(int j = 0; j < 10; j++){ printf("and one liners?"); }
 
-    printf("before forloop"); for(int i = 0; i < 10; i++){ printf("hello"); }
+    printf("before forloop"); for(int i = 0; i < 10; i++){ printf("hello"); } printf("after forloop");
 
     return 0;
 }
