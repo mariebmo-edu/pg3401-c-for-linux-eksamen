@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     char ch;
     char fileName[strlen(argv[1])], newFileName[(strlen(argv[1]) + 12)], line[LINE_LENGTH], updateCondition[LINE_LENGTH];
     regex_t regexForLoop, regexForTab, regexForCurlyBraceEnd;
-    int iRegexResult, iIndentation, iForLoopsFound, iIsInCurrentMatch;
+    int iRegexResult, iIndentation = 0, iForLoopsFound = 0, iIsInCurrentMatch = 0, iTabsFound = 0;
 
     strcpy(fileName, argv[1]);
     createBeautifiedFileName(fileName, newFileName);
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 
         regmatch_t regMatches[6];
         if(regexec(&regexForLoop, line, 6, regMatches, 0) == 0){
-            forLoopToWhileLoop(line, regMatches, fileOut, &iIsInCurrentMatch, &iIndentation, updateCondition, &regexForCurlyBraceEnd);
+            forLoopToWhileLoop(line, regMatches, fileOut, &iIsInCurrentMatch, &iIndentation, updateCondition, &regexForCurlyBraceEnd, &iForLoopsFound);
         } else {
             if(regexec(&regexForCurlyBraceEnd, line, 0, NULL, 0) == 0 && iIsInCurrentMatch > 0){
                 addIndentation(fileOut, iIndentation+4);
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    replaceTabsWithSpacesInFile(fileOut);
+    replaceTabsWithSpacesInFile(fileOut, &iTabsFound);
 
     regfree(&regexForLoop);
     regfree(&regexForTab);
@@ -97,7 +97,13 @@ int main(int argc, char *argv[]) {
     fclose(fileIn);
     fclose(fileOut);
 
+    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     printf("Beautified file %s created\n", newFileName);
+    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+    printf("Number of for-loops converted: %d\n", iForLoopsFound);
+    printf("Number of tabs replaced: %d\n", iTabsFound);
+    printf("----------------------------------------------------------------\n");
+
     return 0;
 }
 void createBeautifiedFileName(char *fileName, char *newFileName) {
@@ -116,7 +122,7 @@ void addIndentation(FILE *fileOut, int iIndentation) {
     }
 }
 
-void forLoopToWhileLoop(char *line, regmatch_t *regMatches, FILE *fileOut, int *iIsInCurrentMatch, int *iIndentation, char *updateCondition, regex_t *regexForCurlyBraceEnd) {
+void forLoopToWhileLoop(char *line, regmatch_t *regMatches, FILE *fileOut, int *iIsInCurrentMatch, int *iIndentation, char *updateCondition, regex_t *regexForCurlyBraceEnd, int *iForLoopsFound) {
 
     size_t beforeLoopLength = regMatches[1].rm_eo - regMatches[1].rm_so;
     size_t initLength = regMatches[2].rm_eo - regMatches[2].rm_so;
@@ -180,6 +186,8 @@ void forLoopToWhileLoop(char *line, regmatch_t *regMatches, FILE *fileOut, int *
         fputs("}\n", fileOut);
         iIsInCurrentMatch--;
     }
+
+    *iForLoopsFound += 1;
 }
 
 void handleCodeBeforeLoop(char *beforeLoop, FILE *fileOut, int *iIndentation) {
@@ -224,9 +232,9 @@ void handleCodeBeforeLoop(char *beforeLoop, FILE *fileOut, int *iIndentation) {
     regfree(&regexForWhiteSpace);
 }
 
-void replaceTabsWithSpacesInFile(FILE *file){
+void replaceTabsWithSpacesInFile(FILE *file, int *iTabsFound){
     char chCurrent;
-    int i, counter, iHaveFoundTab = 0;
+    int i, counter;
 
     chCurrent = fgetc(file);
     while(chCurrent != EOF){
@@ -236,7 +244,7 @@ void replaceTabsWithSpacesInFile(FILE *file){
                 fputc(' ', file);
             }
             counter += iNumOfSpaces;
-            iHaveFoundTab = 1;
+            *iTabsFound++;
         } else {
             fputc(chCurrent, file);
             counter++;
@@ -249,10 +257,5 @@ void replaceTabsWithSpacesInFile(FILE *file){
         chCurrent = fgetc(file);
     }
 
-    if(iHaveFoundTab){
-        printf("Tabs have been replaced with spaces in the file.\n");
-    } else {
-        printf("No tabs found in the file.\n");
-    }
     rewind(file);
 }

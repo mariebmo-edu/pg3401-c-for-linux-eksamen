@@ -14,7 +14,9 @@ I tillegg skal alle forekomster av tab (ASCII kode 0x09) erstattes med 3 spacer 
 
 Jeg valgte å gå all-in med regex, da hoveddelen av oppgaven er å finne et mønster, og endre det.
 Jeg brukte regex for å finne forløkker, og regex for å finne tab, og '}'-chars.
-Koden fungerer også med nestede forløkker.
+Koden fungerer også med nestede forløkker, forløkker på en linje, og forløkker med flere linjer.
+
+Regex kan fort gjøre koden uoversiktlig, så jeg har kommentert koden godt. Jeg legger også ved filen jeg testet med, og resultatet av den (makethispretty.c).
 
 Det kan være bruksområder jeg ikke har tenkt over, men jeg har testet den på en del forskjellige filer, og den fungerer som den skal.
 
