@@ -239,7 +239,6 @@ void forLoopToWhileLoop(char *buffer, regmatch_t *regMatches, FILE *fileOut, int
         if(strlen(afterLoop) > 0 && afterLoop[0] != '\r' && afterLoop[0] != '\n') {
             addIndentation(fileOut, *iIndentation);
             fputs(afterLoop, fileOut);
-            fputc('\n', fileOut);
 
         }
 
