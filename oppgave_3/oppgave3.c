@@ -247,8 +247,11 @@ unsigned int addDateMenu(int *iDateInput){
         }
     }
 
+    szDate[8] = '\0';
+
     // Gjør om dato fra char til int, og sjekker om det er en gyldig dato. Hvis ikke returnerer metoden 0, som gjør at den blir kjørt på nytt.
     *iDateInput = (unsigned int) strtoul(szDate, &pChar, 10);
+
     if(validateDateInput(*iDateInput) == 0){
         return 0;
     } else {

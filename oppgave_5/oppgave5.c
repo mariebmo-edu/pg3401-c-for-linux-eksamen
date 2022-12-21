@@ -60,21 +60,21 @@ int main(int argc, char *argv[]) {
     // Oppretter tråd A og B.
     pthread_t threadA, threadB;
     if (pthread_create(&threadA, NULL, threadAFunction, &threadAData) != 0) {
-        perror("Failed to create thread A");
+        printf("Failed to create thread A");
         exit(EXIT_FAILURE);
     }
     if (pthread_create(&threadB, NULL, threadBFunction, &threadBData) != 0) {
-        perror("Failed to create thread B");
+        printf("Failed to create thread B");
         exit(EXIT_FAILURE);
     }
 
     // Venter på at tråd A og B skal fullføre.
     if (pthread_join(threadA, NULL) != 0) {
-        perror("Failed to join thread A");
+        printf("Failed to join thread A");
         exit(EXIT_FAILURE);
     }
     if (pthread_join(threadB, NULL) != 0) {
-        perror("Failed to join thread B");
+        printf("Failed to join thread B");
         exit(EXIT_FAILURE);
     }
 
@@ -100,7 +100,7 @@ void* threadAFunction(void* pData) {
     // Åpner filen i read binary modus. Hvis filen ikke finnes, avsluttes tråden.
     FILE* pFile = fopen(pThreadAData->fileName, "rb");
     if (pFile == NULL) {
-        perror("Failed to open file");
+        printf("Failed to open file");
         pthread_exit(NULL);
     }
 
