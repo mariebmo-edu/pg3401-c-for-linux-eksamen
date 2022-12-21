@@ -60,21 +60,21 @@ int main(int argc, char *argv[]) {
     // Oppretter tråd A og B.
     pthread_t threadA, threadB;
     if (pthread_create(&threadA, NULL, threadAFunction, &threadAData) != 0) {
-        perror("Failed to create thread A");
+        printf("Failed to create thread A");
         exit(EXIT_FAILURE);
     }
     if (pthread_create(&threadB, NULL, threadBFunction, &threadBData) != 0) {
-        perror("Failed to create thread B");
+        printf("Failed to create thread B");
         exit(EXIT_FAILURE);
     }
 
     // Venter på at tråd A og B skal fullføre.
     if (pthread_join(threadA, NULL) != 0) {
-        perror("Failed to join thread A");
+        printf("Failed to join thread A");
         exit(EXIT_FAILURE);
     }
     if (pthread_join(threadB, NULL) != 0) {
-        perror("Failed to join thread B");
+        printf("Failed to join thread B");
         exit(EXIT_FAILURE);
     }
 
@@ -100,7 +100,7 @@ void* threadAFunction(void* pData) {
     // Åpner filen i read binary modus. Hvis filen ikke finnes, avsluttes tråden.
     FILE* pFile = fopen(pThreadAData->fileName, "rb");
     if (pFile == NULL) {
-        perror("Failed to open file");
+        printf("Failed to open file");
         pthread_exit(NULL);
     }
 
@@ -140,7 +140,7 @@ void* threadBFunction(void* pData) {
         // Låser mutex for å sikre at kun en tråd kan lese fra bufferen om gangen.
         pthread_mutex_lock(&pThreadBData->pThreadData->mutex);
 
-        // Går gjennom bufferen og teller antall ganger hver byte forekommer.
+        // Går gjennom bufferen og teller antall ganger hver byte forekommer ved å caste char til unsigned int og bruke denne som index i arrayen.
         int i = 0;
         while (0 < pThreadBData->pThreadData->iUsedBytes) {
             char c = pThreadBData->pThreadData->szDataBuffer[pThreadBData->pThreadData->iUsedBytes - 1];

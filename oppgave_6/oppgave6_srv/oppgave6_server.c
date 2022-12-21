@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
 
         printf("Connection accepted\n");
 
-        // Leser fra klienten
+        // Åpner en klient-fork. Dette er en ny prosess som håndterer klienten.
         if(!fork()) {
             printf("Child process created\n");
             close(sockServerFd);
@@ -85,9 +85,8 @@ int main(int argc, char *argv[]) {
             // Henter ut filnavnet fra bufferen
             sscanf(szBuffer, "GET /%s HTTP/1.1", szFileName);
 
-            printf("Requested file: %s\n", szFileName);
-
             printf("%s", szBuffer);
+            printf("Requested file: %s\n", szFileName);
 
             // Hvis serveren ikke finner fila, så returnerer vi "webpage", som er en html-side. Hvis serveren finner fila, så returnerer vi filen.
             if(access(szFileName, F_OK) < 0){
@@ -99,23 +98,33 @@ int main(int argc, char *argv[]) {
                 }
             } else {
                 printf("File found\n");
+
+                // Åpner filen og genererer filinformasjon.
                 int fd = open(szFileName, O_RDONLY);
                 struct stat stFileInfo;
                 fstat(fd, &stFileInfo);
 
-                sprintf(szResponseHeader, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n", stFileInfo.st_size);
+                // Genererer headeren som skal sendes til klienten
+                sprintf(szResponseHeader, "HTTP/1.1 200 OK\r\nContent-Length: %lu\r\n\r\n", stFileInfo.st_size);
+
+                // Hvis serveren ikke klarer å skrive til headeren, lukker vi socketen og avslutter.
                 if(write(clientFd, szResponseHeader, strlen(szResponseHeader)) < 0) {
                     printf("ERROR sending header to client\n");
                     close(clientFd);
                     exit(1);
                 }
+
+                // Hvis serveren klarer å sende headeren, så sender vi filen til klienten.
+                printf("Sending file to client, Content-Length: %lu\n", stFileInfo.st_size);
                 sendfile(clientFd, fd, NULL, stFileInfo.st_size);
             }
 
+            // Lukker socketen og avslutter.
             close(clientFd);
             printf("Client -  Connection closed\n");
             exit(0);
         }
+        // Lukker klient-socketen og fortsetter å lytte på server-socketen.
         close(clientFd);
         printf("Client -  Connection closed\n");
     }

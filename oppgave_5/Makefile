@@ -1,6 +1,6 @@
 INCLDIR = ./include
 CC = gcc
-CFLAGS = -O2 -pthread
+CFLAGS = -O2 -pthread -g
 CFLAGS += -I$(INCLDIR)
 
 OBJDIR = obj

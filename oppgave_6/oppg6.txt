@@ -32,3 +32,4 @@ Oppgaven er sjekket med Valgrind med følgende output:
 ==32334== All heap blocks were freed -- no leaks are possible
 ==32334==
 ==32334== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+

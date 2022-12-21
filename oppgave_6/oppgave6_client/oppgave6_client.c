@@ -23,11 +23,14 @@ int main(int argc, char *argv[]){
     char szServerResponse[BUFFER_SIZE];
     char szFileName[128] = "index.html";
     char szMessage[256];
-    unsigned long ulBytesReceived;
+    unsigned long ulBytesReceived = 0;
 
-    if(argv[1] != NULL){
-        strcpy(szFileName, argv[1]);
+    if(argc != 2){
+        printf("Usage: %s <filename>\n", argv[0]);
+        exit(1);
     }
+
+    strcpy(szFileName, argv[1]);
 
     sprintf(szMessage, "GET /%s HTTP/1.1\r\n", szFileName);
 
@@ -73,8 +76,10 @@ int main(int argc, char *argv[]){
     }
 
     printf("Message received from server:\n%s\n", szServerResponse);
-    sscanf(szServerResponse, "Content-Length: %lu\n", &ulBytesReceived);
-    printf("Bytes received: %lu\n", ulBytesReceived);
+
+    // assigner content-length verdien til ulBytesReceived
+    sscanf(szServerResponse, "HTTP/1.1 200 OK\r\nContent-Length: %lu\r\n", &ulBytesReceived);
+    printf("Response from server contains %lu bytes\n", ulBytesReceived);
 
     // Hvis vi mottar en Content-Length header på mer enn 0 bytes, så mottar vi en fil.
     if(ulBytesReceived > 0){
@@ -87,6 +92,7 @@ int main(int argc, char *argv[]){
             exit(1);
         }
 
+        // Stats for å holde styr på hvor mange bytes vi har mottatt.
         unsigned long ulBytesRemaining = ulBytesReceived;
         char fileContent[BUFFER_SIZE];
         int iBytesRead;
@@ -100,10 +106,12 @@ int main(int argc, char *argv[]){
 
         // Lukker filen
         fclose(fp);
+
+        printf("File received\n");
     }
 
-    printf("Message received from server: %s\n", szServerResponse);
     close(sockClientFd);
+    printf("Client terminated\n");
 
     return 0;
 }
