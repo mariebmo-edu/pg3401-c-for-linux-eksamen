@@ -140,7 +140,7 @@ void* threadBFunction(void* pData) {
         // Låser mutex for å sikre at kun en tråd kan lese fra bufferen om gangen.
         pthread_mutex_lock(&pThreadBData->pThreadData->mutex);
 
-        // Går gjennom bufferen og teller antall ganger hver byte forekommer.
+        // Går gjennom bufferen og teller antall ganger hver byte forekommer ved å caste char til unsigned int og bruke denne som index i arrayen.
         int i = 0;
         while (0 < pThreadBData->pThreadData->iUsedBytes) {
             char c = pThreadBData->pThreadData->szDataBuffer[pThreadBData->pThreadData->iUsedBytes - 1];
